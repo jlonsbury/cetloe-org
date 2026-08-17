@@ -1,0 +1,1550 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Course Tagging Survey | Georgia State University</title>
+<style>
+  :root{
+    --blue:#003986; --navy:#00205b; --crimson:#c8102e;
+    --ink:#1b1f2a; --muted:#5a6273; --line:#e3e7ee; --soft:#f5f7fb;
+    --ok:#0d7a6f; --oksoft:#e4f4f1; --warn:#9a6700; --warnsoft:#fbf1da;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);background:#fff;line-height:1.55;font-size:16px;-webkit-font-smoothing:antialiased}
+  a{color:var(--blue)}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+
+  header.top{border-bottom:1px solid var(--line);background:#fff}
+  header.top .wrap{display:flex;align-items:center;gap:12px;padding:14px 20px}
+  .flame{width:28px;height:auto;flex:0 0 auto}
+  .brand{font-weight:700;color:var(--blue);font-size:16px;line-height:1.1}
+  .brand small{display:block;font-weight:500;color:var(--muted);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase}
+
+  main{padding:26px 0 60px}
+  h1.page{font-size:27px;margin:0 0 6px;letter-spacing:-.02em}
+  .lead{font-size:15.5px;color:#2a2f3a;max-width:720px;margin:0 0 20px}
+  .lead b{color:var(--blue)}
+
+  /* ===== skew (from the College to Career app) ===== */
+  .skew{position:relative;z-index:0}
+  .skew::before{z-index:-1;display:block;content:" ";position:absolute;left:0;top:0;bottom:0;right:0;
+    -webkit-transform:skew(-15deg);transform:skew(-15deg)}
+  .skew>*{z-index:1}
+  .skew.blue{color:#fff}
+  .skew.blue::before{background-color:#003986}
+
+  /* ===== stepper ===== */
+  .stepper{display:flex;gap:0;margin:0 0 24px;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+  .stepper button{flex:1;border:none;background:#fff;font-family:inherit;padding:11px 8px;cursor:pointer;
+    font-size:13px;color:var(--muted);display:flex;align-items:center;justify-content:center;gap:8px;
+    border-right:1px solid var(--line)}
+  .stepper button:last-child{border-right:none}
+  .stepper button .n{width:21px;height:21px;border-radius:50%;background:#e6eaf2;color:var(--muted);
+    font-weight:700;font-size:11.5px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .stepper button.on{background:var(--blue);color:#fff;font-weight:600}
+  .stepper button.on .n{background:#fff;color:var(--blue)}
+  .stepper button.done .n{background:var(--ok);color:#fff}
+  .stepper button.done .n::before{content:"✓"}
+  .stepper button.done .n span{display:none}
+
+  /* ===== survey column ===== */
+  .layout{display:block;max-width:900px}
+
+  /* ===== intro flowchart ===== */
+  .flow{display:flex;align-items:stretch;gap:4px;margin:26px 0 6px;flex-wrap:wrap}
+  .fnode{border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;flex:1 1 160px;min-width:160px;
+    display:flex;flex-direction:column;gap:3px;background:#fff}
+  .fnode b{font-size:14.5px}
+  .fnode small{font-size:12px;color:var(--muted);line-height:1.4}
+  .fnode .fn{width:22px;height:22px;border-radius:50%;background:var(--blue);color:#fff;font-weight:700;
+    font-size:11.5px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:4px}
+  .farrow{align-self:center;color:#9aa2b3;font-size:19px;padding:0 3px}
+  @media(max-width:680px){.farrow{display:none}.fnode{flex-basis:100%}}
+  .hint{font-size:12.5px;color:var(--muted)}
+  .hint.okc{color:#0a5d55}
+  .rail{position:sticky;top:16px}
+  .rail .rlabel{font-size:11.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:0 0 8px}
+  .railbox{border:1px solid var(--line);border-radius:12px;padding:16px 18px;background:var(--soft)}
+  .railbox h4{margin:0 0 6px;font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+  .railbox .none{font-size:13px;color:var(--muted);font-style:italic}
+  .railsec{margin-bottom:14px}
+  .railsec:last-child{margin-bottom:0}
+
+  /* code + tag chips */
+  .chips{display:flex;flex-wrap:wrap;gap:6px}
+  .chip{display:inline-flex;align-items:center;gap:6px;border-radius:20px;font-size:12.5px;padding:3px 11px;font-weight:600}
+  .chip.code{background:var(--blue);color:#fff;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;letter-spacing:.03em}
+  .chip.code.pending{background:#fff;color:var(--blue);border:1.5px dashed var(--blue)}
+  .chip.tag{background:var(--oksoft);color:var(--ok);border:1px solid #bfe3dd}
+  .chip.tag.prac{background:#eef2fa;color:var(--blue);border:1px solid #ccd8ec}
+  .chip.warnchip{background:var(--warnsoft);color:var(--warn);border:1px solid #ecd9a8}
+  .chip.review{background:var(--warnsoft);color:var(--warn);border:1.5px dashed var(--warn)}
+
+  /* ===== views ===== */
+  .view{display:none}
+  .view.on{display:block}
+  h2.sec{font-size:20px;margin:0 0 4px}
+  .secsub{font-size:14px;color:var(--muted);margin:0 0 18px;max-width:640px}
+  .secsub b{color:var(--ink)}
+
+  /* material-ish form fields */
+  .forms{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;margin:0 0 10px;max-width:720px}
+  .mf label{display:block;font-size:12px;font-weight:500;color:var(--muted);margin:0 0 2px}
+  .mf input{width:100%;border:none;border-bottom:1px solid #9aa2b3;background:#f4f6fa;
+    border-radius:4px 4px 0 0;padding:9px 12px;font-size:15px;font-family:inherit;color:var(--ink)}
+  .mf input:focus{outline:none;border-bottom:2px solid var(--blue);padding-bottom:8px;background:#eef2fa}
+  .mf.full{grid-column:1/-1}
+
+  /* competency / practice boxes */
+  .boxes{display:grid;grid-template-columns:1fr;gap:10px}
+  .cbox{background:#fff;border:1px solid var(--line);border-radius:6px;box-shadow:0 1px 3px rgba(27,31,42,.08)}
+  .cbox>.head{display:flex;align-items:center;gap:12px;width:100%;border:none;background:none;
+    padding:10px 12px;cursor:pointer;text-align:left;font-family:inherit}
+  .cbox .skewname{font-size:15px;font-weight:500;padding:6px 22px 6px 14px;display:inline-block}
+  .cbox .head img{height:38px;width:38px;object-fit:contain;margin-left:auto}
+  .cbox .cnt{font-size:12px;font-weight:700;color:#fff;background:var(--crimson);border-radius:20px;
+    padding:2px 9px;min-width:26px;text-align:center}
+  .cbox .cnt.zero{background:#c3c9d6}
+  .cbox .chev{color:var(--muted);font-size:19px;transition:transform .18s;margin-left:2px}
+  .cbox.open .chev{transform:rotate(90deg)}
+  .cbox .items{display:none;padding:2px 14px 14px;border-top:1px solid var(--line)}
+  .cbox.open .items{display:block}
+  label.sk{display:flex;gap:10px;align-items:flex-start;padding:6px 4px;cursor:pointer;border-radius:6px}
+  label.sk:hover{background:var(--soft)}
+  label.sk input{margin-top:3px;width:16px;height:16px;accent-color:var(--blue);flex:0 0 auto}
+  label.sk .st{font-size:14px}
+  label.sk .sd{font-size:12.5px;color:var(--muted);margin-top:1px}
+  .req{font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--crimson);margin-left:6px;white-space:nowrap}
+
+  /* depth chips inside a competency */
+  .depth{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin:10px 2px 2px;padding:10px 12px;
+    background:var(--soft);border-radius:8px}
+  .depth .q{font-size:12.5px;font-weight:600;color:var(--muted);margin-right:2px}
+  .depth button{border:1.5px solid #c3cbdb;background:#fff;border-radius:20px;padding:4px 13px;font-size:12.5px;
+    font-family:inherit;cursor:pointer;color:var(--ink)}
+  .depth button.on{border-color:var(--blue);background:var(--blue);color:#fff;font-weight:600}
+  .depth .dhint{flex-basis:100%;font-size:11.5px;color:var(--muted)}
+
+  /* HIP screener chips */
+  .screener{display:flex;flex-wrap:wrap;gap:9px;margin:0 0 22px}
+  .screener button{border:1.5px solid #c3cbdb;background:#fff;border-radius:22px;padding:8px 16px;font-size:13.5px;
+    font-family:inherit;cursor:pointer;color:var(--ink);transition:all .12s}
+  .screener button:hover{border-color:var(--blue)}
+  .screener button.on{border-color:var(--blue);background:var(--blue);color:#fff;font-weight:600}
+  .screener button.on::before{content:"✓ ";font-weight:700}
+
+  /* HIP verification panel */
+  .vpanel{border:1px solid var(--line);border-radius:10px;margin:0 0 16px;overflow:hidden;background:#fff;
+    box-shadow:0 1px 3px rgba(27,31,42,.08)}
+  .vpanel .vhead{display:flex;align-items:center;gap:12px;padding:12px 14px;flex-wrap:wrap}
+  .vpanel .vhead .skewname{font-size:15.5px;font-weight:500;padding:6px 22px 6px 14px;display:inline-block}
+  .vstatus{margin-left:auto;font-size:12px;font-weight:700;border-radius:20px;padding:3px 12px}
+  .vstatus.ok{background:var(--oksoft);color:var(--ok)}
+  .vstatus.no{background:var(--warnsoft);color:var(--warn)}
+  .vbody{padding:2px 16px 16px}
+  .vpart{margin-top:12px}
+  .vpart .pt{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:0 0 4px}
+  .vpart .pt b{color:var(--ink)}
+  .vpart .pdesc{font-size:12.5px;color:var(--muted);margin:0 0 6px}
+  .vgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px;align-items:start}
+  .eblock{border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:#fff}
+  .eblock.met{border-color:#bfe3dd;background:#fbfdfd}
+  .ehead{display:flex;align-items:flex-start;gap:8px;margin:0 0 2px}
+  .ehead .et{font-size:13px;font-weight:600;flex:1;line-height:1.35}
+  .emet{font-size:10.5px;font-weight:700;border-radius:20px;padding:2px 9px;background:#eceff5;color:var(--muted);
+    flex:0 0 auto;white-space:nowrap;margin-top:1px}
+  .emet.y{background:var(--oksoft);color:var(--ok)}
+  label.sk.ind{padding:3px 2px}
+  label.sk.ind .st{font-size:12.5px;color:#333a49}
+  .branch{background:var(--soft);border-radius:8px;padding:10px 12px;margin-top:12px}
+  .branch .q{font-size:13px;font-weight:600;margin:0 0 6px}
+  .branch label{display:flex;gap:8px;align-items:flex-start;font-size:13.5px;padding:4px 2px;cursor:pointer}
+  .branch label input{accent-color:var(--blue);margin-top:3px}
+  .branch .codehint{font-size:11.5px;color:var(--muted);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+
+  /* nav buttons */
+  .navrow{display:flex;gap:10px;align-items:center;margin-top:24px}
+  .btn{background:var(--blue);color:#fff;border:none;border-radius:4px;padding:10px 24px;font-weight:500;
+    font-size:14.5px;cursor:pointer;font-family:inherit;letter-spacing:.02em;box-shadow:0 2px 4px rgba(0,0,0,.2)}
+  .btn:hover{background:#00297a}
+  .btn.stroked{background:#fff;color:var(--blue);border:1px solid var(--blue);box-shadow:none}
+  .btn.stroked:hover{background:#eef3fc}
+  .btn.text{background:none;border:none;color:var(--muted);box-shadow:none;font-weight:500}
+  .btn.text:hover{color:var(--ink);background:var(--soft)}
+  .navrow .spacer{flex:1}
+
+  /* ===== results ===== */
+  .res{border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:0 0 16px;background:#fff;
+    box-shadow:0 1px 3px rgba(27,31,42,.08)}
+  .res h3{margin:0 0 4px;font-size:16.5px}
+  .res .rsub{font-size:13px;color:var(--muted);margin:0 0 12px}
+  .codeline{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--soft)}
+  .codeline:first-of-type{border-top:none}
+  .codeline .cc{flex:0 0 auto}
+  .codeline .cd{font-size:13.5px}
+  .codeline .cd small{display:block;color:var(--muted);font-size:12px}
+  .misslist{margin:6px 0 0;padding-left:20px;font-size:13px;color:#3a4150}
+  .misslist li{margin:2px 0}
+  .emg{padding:10px 0;border-top:1px solid var(--soft)}
+  .emg:first-of-type{border-top:none}
+  .emg .en{font-weight:600;font-size:14.5px}
+  .callout{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px 16px;font-size:13.5px;margin:0 0 16px}
+  .callout.ok{background:var(--oksoft);border-color:#bfe3dd;color:#0a5d55;max-width:720px}
+
+  /* syllabus attach + none-of-these */
+  .filerow{display:flex;align-items:center;gap:14px;margin:6px 0 2px;flex-wrap:wrap}
+  .filename{font-size:13.5px;color:var(--muted)}
+  .filename.on{color:var(--ok);font-weight:600}
+  .noneopt{margin-top:14px;border:1.5px dashed #c3cbdb;border-radius:8px;padding:10px 12px;display:flex}
+  .noneopt .st{color:var(--muted)}
+  #submitbtn:disabled{background:var(--blue)}
+  .cdet{margin:16px 0 0}
+  .cdet summary{cursor:pointer;color:var(--blue);font-size:13.5px;margin:0 0 10px;user-select:none}
+  .cdet summary:hover{text-decoration:underline}
+
+  /* share card */
+  .sharewrap{margin:4px 0 12px}
+  .sharewrap canvas{width:100%;max-width:640px;height:auto;border:1px solid var(--line);border-radius:8px;display:block;background:#fff}
+  .sharebtns{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0 4px}
+  .altlabel{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:14px 0 4px}
+  .alttext{width:100%;font:12.5px/1.5 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;padding:10px 12px;
+    border:1px solid var(--line);border-radius:8px;background:var(--soft);color:var(--ink);min-height:88px;resize:vertical;box-sizing:border-box}
+
+  .snackbar{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(80px);
+    background:#323232;color:#fff;padding:13px 22px;border-radius:4px;font-size:14px;z-index:400;
+    box-shadow:0 3px 10px rgba(0,0,0,.3);transition:transform .22s;max-width:90vw}
+  .snackbar.show{transform:translateX(-50%) translateY(0)}
+
+  /* ===== print summary ===== */
+  #printArea{display:none}
+  @media print{
+    body>*{display:none !important}
+    body>#printArea{display:block !important}
+    body{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  }
+  .psum{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;color:#1b1f2a}
+  .psum h1{font-size:1.5em;padding:8px 18px;color:#fff;margin:14px 0 18px;display:inline-block}
+  .psum table.details{border-collapse:collapse;margin-bottom:14px}
+  .psum table.details td{padding:2px 14px 2px 0;font-size:15px;vertical-align:top}
+  .psum h2{font-size:1.1em;margin:18px 0 6px;color:#003986}
+  .psum ul{margin:4px 0;padding-left:22px;font-size:14px}
+  .psum .chips{margin:6px 0}
+
+  @media(max-width:960px){
+    .layout{grid-template-columns:1fr}
+    .rail{position:static}
+    .vgrid{grid-template-columns:1fr}
+  }
+  @media(max-width:680px){
+    .forms{grid-template-columns:1fr}
+    h1.page{font-size:23px}
+    .stepper button .lbl{display:none}
+  }
+</style>
+</head>
+<body>
+
+<header class="top"><div class="wrap">
+  <!-- Official GSU flame mark (Flame_RGB.png, GSU Communications ToolKit), inlined so the file stays self-contained -->
+  <img class="flame" alt="Georgia State University flame" src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAANIAAADdCAMAAAD5EdylAAAAJ1BMVEVHcEwAOaYAOaYAOaYAOaYAOaYAOaYAOaYAOaYAOaYAOaYAOaYAOaYWvHtpAAAADHRSTlMAwDrYmmbwEIAgsFD32JXsAAAJIklEQVR42t2d25rjqA6F0YGT0fs/7/6mand5OhgkQuEx0VXfdEU/kpYk4iTuPos+uo+ywoTugywnkuQ+yPAQ+agQeRKR44PK6Avok5LuGyh49ymGJF9EH1NG+ZAPI0rhw4iQ5MOIknwYUYZPIypB/tiHECX5sc/oR/E4idh9gkU6icjtaTHW2v1tIbsdLbP/NxIGOa24DQ2B0LWIDrefIcgRm0RhvwUJQYTdC9HOaRdZRHxT60TAbWY+KESymdpluJjeDhHZtsn6cEGURLbVhnhczaN44mx3e4J0NY/GsG+QfLgiciDbVlK6dtmL7Cp3fD3q5CAiW45C8f9EFK/Tbr9VNlLjOqHIP7bhmhSpsXxHkk0VHFqFkmRTceBWy4lh07zj5p1Pkj3zzjdDEINsqXd4+qsGKbgd7GylcBWkHYchqoJUZeRmF6zc2b5Jdiyl0nEXZcdSOqtFoBHA3a5Rjl6ZBNlQHUpvLPCyoTpE6nl7yIbqkOS0aMg7efytQ+5WSZHa3NPt6KYUi8huYzj2nSXZT8Ohm3dZ9kPCvpQVke3aEvTzjkVks/0PleOH/ZAOpYXKdkhZGbBxPyRW8q7shxSUaTRth+S160beDunQ5hzYDSmrb6+E3ZC86qnIZtMDaYtdFNlrxsuiqQPuhuQ7i92JtNW+dHTO/kTaaquVHtIZx43uHrArzefwsNENUTIibXSPB7qfSWSrXqtn04m0x2McaELaSsW9CWkrFWcDkpetJA8MbqJsJXnBhrTRLB7FhLSTPmCF1BP6LR4hKqb6CDsVk+2xIJCNmm2N1FH6PR4TOOTFQAV/+gdIwISE8uzMi10kaUn9g9fAkiskXZhJnqx5rMgzXuvDk7stKE00Neb1546usUKyVHyWBwtEqZBMvYbkuUMRV0jWYnrsOE6sIfnrzvTcML2UP1mrgx4bJnxBAmsx8WPD5Csk4+CG8tQw8QvSYXaRnhomeEFK5pXBPzVM8oLkzStDDM8MU35FQvupszxyhEARNkw6sXEcT5z0vAgYbkp8Z1182vu2SQQMflIrxPK8vQkqpKQkkjFMFN1/ZFBFoCj1XofpYe+fBRExXStkW5ge8LU9UiE5GuieKM/rtxd1wrNh0oU8wSLzzqHyjRRTYaJON1xkyTm8KuQwEiZ+S8hhMRLbvGTlE521hdju8GsMnMOrTl+GZtH0lkLQWqRQK/tAb4r0jkL4ZUjlcijlIQeLtA1uDhP8yRo0ChKN17q/OUx/kJLVSa8qhH3Uo6VIoByhJmHpnVHPL0UK5reXefzEsxKmNUiC5nPH4WkAbg3Tj1p581UJueEZAu8M08/xgr08/HBzIiVMa5AkVj6qa5C9Ofkbw4Q/SEUJk14bxxujnl+JxAMXj8WNXlTyfWGKP0hhoNmEOJx6+bYwOefqfNeP/VBSzy7kMSxEOvQj1FNvXMjTAqRebtBg6vk3wrQAiTqzGI56CONCzr+OdHpBSnVMjuR008XKX6fkR1wMeTT1/C06Dn/VJw1VL4w6SLfoOPz9F3HIxTSaR/4OHYe/fYAxF3FQlWmNQNQHnRUneXAFjzQapvLbSE5OI8XFyRtlukEgymsv8ROpZ1f++cxTXGJtKmBlabArP63PvFiJKOupp8+vaTRMv6h5F4mFY6lXFIUY2x7nDS4GR4pDxx7yWPfExd2WrwSHdU3Szx0mRHLK/GX5F6Xi556ojGuLCS/DHnAoNUIeCpNfW0yNJ4EoDr0oDIWJlu621KqUY2LOUZsZriwmbr580l5VT72svOqadd23u7efWJ2Uagor9SG3zyiYV6fx0bCse2aAen8w4ODWbveS102u3JVoiiPj5TGg+2Gd5JV+LVMcOUscqA9cNRIFrUwotpR88gB4lYqzekg88srJruO0CqlUfcHC5EcUggbmPJm3YJl3uKFjk/xlDRIrYjb+RhqaZ4K0BgltScJ2JQdzSGEJElkbA48PpHrmLRkfknlwZLOSk1nz8gqkaD98Nguut2oeLkDigW1AkpUerOeUFiDlocnRW1MPjcXEU5fI9gUni5kJrX8Xza8/r+BXxnYmtkb/LiRQvmFSZ4rBmFFg3S+mgzT9AJoXm69sbEx5QZCqtVVZc8GWocmIhL8sd7UD+kaEtvW2GJHKZE9qWiQ7E7d7uE4+vajbf6e02M8imzIvG5F47vauZ2D/r2zKPCMSrNAGXSFE0BiAcaSwQMBNVzUU9TDhO0h5dql4P/UO3Y9kQKIJwVP+1njqFZUeDEgwKniTHwv1Zr30ygBhR4IptdONzUoe9E5uS/8FTdbecCVr8DiOhKLY9IfGMRgVouipIAr1VKMN6KxWjG0gKiGwItH0jbFuyRgm0NIbLW0pz0rDtETkPjqoSFRp7Jw0zEsE9z0G1Vu2552SLeNMem/SkJJlWl8pduPP2JCCdFiW/nkiu5TrIWcFiQwXFLSeSGeKZ2IpSIYiwIVEdqZS+dNAQkMp8UIiOxP3fGatTHIlDsuJdCbqzQ9JUQequ/p6Ip0pdoolKaM6T348gaObM6S+DHcHL9QlPK2dGfSeW0ei67LX844WzHU60yGVcQcp9kuJZ9psmCBSZBY6SMrugROVRLjs90mE2kjQX7toopJAEYY54WsLAPebqH8/SLzm58d1JN+V8BDfHRxCWfxLMtgsb7T/7jCK3Si737cSLhznjjqwNgzB5C3xvGWokaAzK2lB8uuVTrdUIXWc9oqCx7BgBJoYj3KrGop94bWHaKlFli9rRuKkV4JUbg2RHqjQOunDusLn8IgQ1d/0WnelXqXgqNqF5G6yDL6VPLEjDjw6CR3Z3W7c9pq6PQlFN0B3v9UTD3aClIb0m7z7L6y0+yx0bwzgoUDOIbXEAbv7Oz8V6B/zcD1mQ0/AvSIKOORB+jKfE34lTsrzkeKqWq6CFLJNGgIPusQAIQAwfh0oBkE3b9HTa5Cos0Vh6ATorYwD+D4ocpFEQTJbTiQivp1ZYPm8kM/OTSCxMIVDRbIb8tH2OmSFSOfRkTCJ+CS4cgU5rXSJwuGjU01HcsBuDVJuT0KRLnA0H+xIzi1CiiVB1WSviIC/s+35SF+WMTF8EwR8JSLghN80GyH9MUTEn3+n5BHx9/u9/xLd/P0a+X8cABhA4F9q9AAAAABJRU5ErkJggg==">
+  <div class="brand">Georgia State University</div>
+</div></header>
+
+<main><div class="wrap">
+  <div class="stepper" id="stepper" role="tablist" style="display:none">
+    <button onclick="go(1)" id="stbtn-1"><span class="n"><span>1</span></span><span class="lbl">Syllabus</span></button>
+    <button onclick="go(2)" id="stbtn-2"><span class="n"><span>2</span></span><span class="lbl">Career-Ready Skills</span></button>
+    <button onclick="go(3)" id="stbtn-3"><span class="n"><span>3</span></span><span class="lbl">High-Impact Practices</span></button>
+    <button onclick="go(4)" id="stbtn-4"><span class="n"><span>4</span></span><span class="lbl">Submit</span></button>
+    <button onclick="go(5)" id="stbtn-5"><span class="n"><span>5</span></span><span class="lbl">Review &amp; Codes</span></button>
+  </div>
+
+  <div class="layout">
+    <div><!-- ============ survey steps ============ -->
+
+      <!-- INTRO -->
+      <section class="view" id="view-0">
+        <h1 class="page">Submit your syllabus.</h1>
+        <p class="lead">Your syllabus is submitted together with a short survey about your course.
+          Here&rsquo;s the whole process:</p>
+        <div class="flow" role="img" aria-label="Process: attach your syllabus, answer two short surveys, submit everything together, then review and download materials.">
+          <div class="fnode"><span class="fn">1</span><b>Attach your syllabus</b><small>Nothing is submitted yet</small></div>
+          <span class="farrow" aria-hidden="true">→</span>
+          <div class="fnode"><span class="fn">2</span><b>Two short surveys</b><small>Career-ready skills &amp; High-Impact Practices · about 4 minutes</small></div>
+          <span class="farrow" aria-hidden="true">→</span>
+          <div class="fnode"><span class="fn">3</span><b>Submit</b><small>Syllabus and survey go to the portal together</small></div>
+          <span class="farrow" aria-hidden="true">→</span>
+          <div class="fnode"><span class="fn">4</span><b>Review</b><small>See what was tagged; download shareables for iCollege</small></div>
+        </div>
+        <p class="hint" style="margin-top:14px">A link to the syllabus you upload will be added to your corresponding iCollege course(s).</p>
+        <div class="navrow" style="margin-top:24px"><button class="btn" style="padding:12px 34px;font-size:15.5px" onclick="go(1)">Begin →</button></div>
+      </section>
+
+      <!-- STEP 1 : course -->
+      <section class="view" id="view-1">
+        <h2 class="sec">Your syllabus</h2>
+        <p class="secsub">Attach the file you&rsquo;re submitting.</p>
+        <div class="callout ok" id="prefill-note" style="display:none"></div>
+        <div class="filerow">
+          <button type="button" class="btn stroked" onclick="el('f-syl').click()">Attach syllabus file…</button>
+          <span class="filename" id="f-sylname">No file attached</span>
+          <input type="file" id="f-syl" hidden accept=".pdf,.doc,.docx,.html,.htm" onchange="sylFile(this)">
+        </div>
+        <p class="hint okc" id="sylread" style="display:none;margin-top:10px"></p>
+        <p class="hint" style="margin-top:10px">Attaching doesn&rsquo;t submit anything — your syllabus goes to the portal after the surveys, when you hit Submit at step 4.</p>
+        <p class="hint" style="margin-top:6px">A link to the syllabus you upload will be added to your corresponding iCollege course(s).</p>
+        <div class="navrow"><button class="btn text" onclick="go(0)">← Overview</button><span class="spacer"></span><button class="btn" onclick="go(2)">Continue →</button></div>
+      </section>
+
+      <!-- STEP 2 : NACE -->
+      <section class="view" id="view-2">
+        <h2 class="sec">Career-ready skills</h2>
+        <p class="secsub">These are the eight competencies employers say they value most (from GSU&rsquo;s College to Career initiative).
+          Open any that fit your course, check the skills students actually use, then tell us <b>how deeply</b> students engage them.
+          Skip any that don&rsquo;t apply.</p>
+        <div class="boxes" id="nace-boxes"></div>
+        <label class="sk noneopt"><input type="checkbox" id="nace-none" onchange="setNone('nace',this.checked)"><span class="st">None of these competencies are intentionally built into this course.</span></label>
+        <div class="navrow"><button class="btn text" onclick="go(1)">← Back</button><span class="spacer"></span><button class="btn" onclick="go(3)">Continue →</button></div>
+      </section>
+
+      <!-- STEP 3 : HIPs -->
+      <section class="view" id="view-3">
+        <h2 class="sec">High-Impact Practices</h2>
+        <p class="secsub">First: which of these happen in this course? Select any that apply — then a short check for each
+          confirms it meets the research-based bar for a High-Impact Practice. <b>It&rsquo;s fine if none apply.</b></p>
+        <div class="screener" id="hip-screener"></div>
+        <label class="sk noneopt"><input type="checkbox" id="hips-none" onchange="setNone('hips',this.checked)"><span class="st">This course doesn&rsquo;t include any of these practices.</span></label>
+        <div id="hip-panels"></div>
+        <div class="navrow"><button class="btn text" onclick="go(2)">← Back</button><span class="spacer"></span><button class="btn" onclick="go(4)">Continue →</button></div>
+      </section>
+
+      <!-- STEP 4 : submit -->
+      <section class="view" id="view-4">
+        <h2 class="sec">Submit your syllabus</h2>
+        <p class="secsub">One last check — your syllabus and survey go to the portal together.</p>
+        <div id="submitbody"></div>
+        <div class="navrow">
+          <button class="btn text" onclick="go(3)">← Back</button>
+          <span class="spacer"></span>
+          <button class="btn" id="submitbtn" onclick="submitSurvey()">Submit syllabus &amp; survey</button>
+        </div>
+      </section>
+
+      <!-- STEP 5 : review & codes (after submission) -->
+      <section class="view" id="view-5">
+        <h2 class="sec">Review &amp; codes</h2>
+        <p class="secsub">Here&rsquo;s what your answers tagged, plus materials you can share with students.</p>
+        <div id="results"></div>
+        <div class="navrow">
+          <span class="spacer"></span>
+          <button class="btn stroked" onclick="copyLink()">Copy Link</button>
+          <button class="btn stroked" onclick="downloadJSON()">Download JSON</button>
+          <button class="btn stroked" onclick="printSummary()">Download PDF</button>
+        </div>
+        <p class="secsub" style="margin-top:10px">Download PDF opens your browser&rsquo;s print dialog — choose &ldquo;Save as PDF.&rdquo;
+          Copy Link shares this page with your answers filled in. JSON is the machine-readable record for the tagging pipeline.</p>
+      </section>
+
+    </div>
+
+  </div>
+</div></main>
+
+<div class="snackbar" id="snackbar" role="status"></div>
+<div id="printArea"></div>
+
+<script>
+/* ================= data ================= */
+var ICON_BASE="https://cdn.gsu.edu/apps-assets/career-prep/";
+/* official flame mark, read from the inlined header image */
+var FLAME_URI=document.querySelector("header img.flame").src;
+
+var COMPS=[
+ {name:"Critical Thinking/Problem Solving",icon:"critical-thinking.png",items:["recognize, build, and appraise arguments","create and implement action plans","analyze visual data","conduct academic and archival research","mine and analyze data","create and implement solutions to crises/problems","identify errors in reasoning","provide useful summaries/precis","connect valid research to support arguments/claims","weigh options by considering impact"]},
+ {name:"Oral/Written Communication",icon:"oral-written-communication.png",items:["communicate to a mass audience","use presentation software effectively","produce successful and convincing proposals","engage in social/community/political activism","edit and publish material","engage in storytelling and analyze narrative","prepare interview questions and answers","curate and maintain social media information","translate research","participate in active listening and respond appropriately"]},
+ {name:"Teamwork/Collaboration",icon:"teamwork-collaboration.png",items:["assist in organizing and planning","collaborate in group projects","participate in collaborative writing","design and assess tasks","prioritize tasks","follow through on tasks","manage executive function","navigate conflict","listen and respond appropriately","show commitment and follow through"]},
+ {name:"Digital Technology",icon:"digital-technology.png",items:["demonstrate technical and program literacy","design creative digital solutions","know and apply field-related technology to solve challenges","engage in copywriting and editing tasks","translate data","create audience-appropriate layouts","engage in variety of digital publishing formats","produce audio and video solutions","manage podcast projects","use variety of modalities to express meaning"]},
+ {name:"Leadership",icon:"leadership.png",items:["organize and manage projects","develop time management strategies","train/teach others how to perform tasks","observe and reflect","perform an advisory role","develop and implement outcomes","promote critical literacy","take calculated risks","manage conflict resolution","generate ideas"]},
+ {name:"Professionalism/Work Ethic",icon:"professionalism-work-ethic.png",items:["meet deadlines","demonstrates sensitivity to other's concerns","ask and respond appropriately to questions","accept responsibility","anticipate needs","seek other perspectives","demonstrate time management","adapt to changed circumstances/environment","interpret other's emotions","solicit and adjust to feedback"]},
+ {name:"Career Management",icon:"career-management.png",items:["adapt to professional situations","demonstrate an awareness to digital presence","set and achieve goals","articulate interests, skills, and values","show attention to detail","take initiative","network","curate e-portfolio","identify support groups needed to achieve goals","implement solutions"]},
+ {name:"Global/Intercultural Fluency",icon:"global-intercultural-fluency.png",items:["show an awareness of diverse perspectives","demonstrate respect for other cultures","approach team/group communication with sensitivity and openness","show awareness of global/community issues","question forms of power, privilege, and inequality","develop a sense of personal and civic responsibility","analyze cultural norms and values","understand the influence of history, geography, gender, race, ethnicity, etc. on identity","develop strategies for communicating with people with different languages","demonstrate self-sufficiency in 'outside the comfort zone' situation"]}
+];
+
+var DEPTHS=[
+ {k:"graded",label:"Practiced & graded",tag:"Assessed",hint:"Students practice these skills in work that receives a grade or structured feedback."},
+ {k:"practiced",label:"Practiced, not graded",tag:"Practiced",hint:"Students use these skills in course activities, but they aren't formally assessed."},
+ {k:"mentioned",label:"Introduced only",tag:null,hint:"The skills are named or discussed, but students don't yet practice them. (Not tagged.)"}
+];
+
+/* Kuh / O'Donnell elements, titled and glossed per CETLOE's "Eight Elements of
+   High-Impact Practices" series (cetloe.gsu.edu). CETLOE rule: 1 & 2 required +
+   at least one of 3–8, AND the practice must carry ≥20% of the overall grade.
+   Each element is verified through concrete indicators; it counts as present
+   only when at least `need` of its indicators are checked. */
+var ELEMENTS=[
+ {t:"Performance expectations set at appropriately high levels",s:"high expectations",req:true,need:2,inds:[
+   "Rubrics or TILT-style assignment guides spell out purpose, tasks, and grading criteria",
+   "Students see concrete examples of what high-quality work looks like",
+   "Standards are held — top marks require more than completion, with support available to reach them"]},
+ {t:"Significant investment of time and effort by students over an extended period of time",s:"time & effort over time",req:true,need:2,inds:[
+   "The experience runs across a significant stretch of the term — not a single week or unit",
+   "Work is scaffolded into smaller, sequential tasks with milestones that keep students engaged regularly",
+   "It demands substantial student work outside of class time"]},
+ {t:"Interaction with faculty and peers about substantive matters",s:"substantive interaction",req:false,need:2,inds:[
+   "Students interact with the instructor regularly about the substance of their work (feedback sessions, conferences, RSI-style interaction) — beyond logistics",
+   "Structured activities have students engage each other's ideas and work (peer feedback sessions, teams, seminar discussion)"]},
+ {t:"Experiences with diversity",s:"diversity of viewpoints",req:false,need:2,inds:[
+   "Students engage diverse viewpoints, worldviews, or frameworks — disciplinary schools of thought and/or perspectives different from their own",
+   "Students analyze and discuss those differing histories, values, and arguments — the encounter isn't left unexamined"]},
+ {t:"Frequent, timely, and constructive feedback",s:"frequent feedback",req:false,need:2,inds:[
+   "Students get feedback at multiple points along the way — not only a final grade",
+   "Feedback arrives in time for students to use it in the next stage or a revision",
+   "Feedback is instructive, not just evaluative — it explains what to improve and why"]},
+ {t:"Periodic, structured opportunities to reflect and integrate learning",s:"structured reflection",req:false,need:2,inds:[
+   "Structured prompts (journals, logs, discussions) have students reflect before, during, and after key experiences — not just once at the end",
+   "Prompts ask students to connect the experience to course goals, other courses, and real-world situations"]},
+ {t:"Opportunities to discover relevance of learning through real-world applications",s:"real-world application",req:false,need:2,inds:[
+   "Students apply their learning to unscripted, real problems — answers aren't in the back of the book",
+   "The context is authentic: a community partner, client, field site, public audience, or real data"]},
+ {t:"Public demonstration of competence",s:"public demonstration",req:false,need:2,inds:[
+   "Students share finished work with an audience beyond the instructor — peers, professionals, employers, or the community",
+   "That audience responds — review, Q&A, critique, or feedback"]}
+];
+var GRADE_BANDS=[
+ {k:"lt10",label:"Under 10%",ok:false},
+ {k:"10_19",label:"10–19%",ok:false},
+ {k:"20_39",label:"20–39%",ok:true},
+ {k:"40plus",label:"40% or more",ok:true}
+];
+function gradeBand(k){return GRADE_BANDS.filter(function(b){return b.k===k;})[0]||null;}
+function elemState(st,ei){
+  var n=0;
+  if(st&&st.elems&&st.elems[ei])for(var k in st.elems[ei])if(st.elems[ei][k])n++;
+  return {n:n,need:ELEMENTS[ei].need,met:n>=ELEMENTS[ei].need};
+}
+
+/* Banner attribute codes — from OII/IE data report (C. Visaggi, Jan 2026) */
+var CODES={
+ ZCAP:{d:"Capstone HIP Course"},
+ ZCIP:{d:"Common Intellectual Experience HIP Course"},
+ ZCOP:{d:"Collaborative Assignment HIP Course"},
+ ZEPP:{d:"ePortfolio HIP Course"},
+ ZFYP:{d:"First-Year Experience HIP Course"},
+ ZHIR:{d:"Course meets HIP requirements"},
+ ZIVE:{d:"Virtual Exchange Course"},
+ ZLCP:{d:"Learning Community HIP Course"},
+ ZSAB:{d:"Study Abroad"},
+ ZSAC:{d:"Faculty-Led Study Abroad"},
+ ZSAW:{d:"Study Away"},
+ ZSLP:{d:"Service Learning HIP Course"},
+ ZURP:{d:"Undergraduate Research HIP Course"},
+ ZWIP:{d:"Writing Intensive HIP Course"},
+ ZWLP:{d:"Work-Based Learning HIP Course"},
+ ZSAK:{d:"Study Abroad — Exchange/INEX",pending:true},
+ ZSAL:{d:"Study Abroad — Third party/Affiliate",pending:true},
+ ZDGP:{d:"Global/Diversity HIP",pending:true}
+};
+
+/* Practices: defining criteria (Part A) distinguish the real HIP from look-alikes. */
+var HIPS=[
+ {id:"collab",name:"Collaborative Assignments & Projects",codes:["ZCOP"],
+  look:"More than occasional in-class group work:",
+  gates:[
+   "Students produce a shared, graded deliverable in teams",
+   "The same team works together across multiple weeks",
+   "Team process is structured — roles, team agreements, or peer evaluation"]},
+ {id:"writing",name:"Writing-Intensive",codes:["ZWIP"],
+  look:"More than a single term paper:",
+  gates:[
+   "Students complete multiple writing assignments across the term",
+   "At least one assignment is revised after instructor or peer feedback",
+   "Writing is a major share of the course grade"]},
+ {id:"global",name:"Diversity / Global Learning",codes:[],branch:true,
+  look:"More than a diverse reading list:",
+  gates:[
+   "Engaging with difference (cultural, global, or lived experience) is a stated course outcome",
+   "Students interact directly with people, communities, or materials representing perspectives different from their own",
+   "Structured reflection asks students to examine their own perspectives"]},
+ {id:"eport",name:"ePortfolios",codes:["ZEPP"],
+  look:"More than a folder of submitted files:",
+  gates:[
+   "Students curate a portfolio of their work over the term (or program)",
+   "Students write reflections connecting portfolio artifacts to their learning",
+   "The portfolio is graded or shared with a real audience"]},
+ {id:"place",name:"Place-Based Learning",codes:[],review:true,
+  look:"More than a field-trip day:",
+  gates:[
+   "Learning is anchored in a specific place or community (e.g., Atlanta as classroom, field sites)",
+   "Students spend structured time in that place — not only reading about it",
+   "Graded assignments connect the place to course concepts"]},
+ {id:"ugr",name:"Undergraduate Research",codes:["ZURP"],
+  look:"More than reading published studies:",
+  gates:[
+   "Students pursue an actual question using the field's methods and evidence",
+   "Students are mentored through the research process across the term",
+   "Students communicate findings (paper, poster, or presentation)"]},
+ {id:"intern",name:"Internships / Field Experiences",codes:["ZWLP"],
+  look:"More than a site visit or shadowing day:",
+  gates:[
+   "Students spend substantial hours in an authentic work setting",
+   "A site supervisor or mentor provides ongoing feedback",
+   "Graded academic work connects the experience to course learning outcomes"]},
+ {id:"service",name:"Service- / Community-Based Learning",codes:["ZSLP"],
+  look:"More than extra-credit volunteering:",
+  gates:[
+   "Service responds to a need identified with a community partner",
+   "Service is a required, integrated part of the course — not an add-on",
+   "Structured reflection connects the service to course learning outcomes"]},
+ {id:"capstone",name:"Capstone Courses & Projects",codes:["ZCAP"],
+  look:"More than a big final assignment:",
+  gates:[
+   "The project requires students to integrate and apply learning from across their program",
+   "Students produce a substantial culminating product (thesis, exhibit, performance, portfolio)",
+   "Students present, defend, or publicly share the work"]},
+ {id:"cie",name:"Common Intellectual Experiences",codes:["ZCIP"],
+  look:"More than a shared textbook:",
+  gates:[
+   "The course is part of a required common curriculum or a broadly shared intellectual theme",
+   "The theme is integrated across courses and/or co-curricular programming"]},
+ {id:"fye",name:"First-Year Seminars & Experiences",codes:["ZFYP"],
+  look:"More than an orientation session:",
+  gates:[
+   "The course is designed for first-year students",
+   "Students meet regularly with faculty or staff in a small-group setting",
+   "Critical inquiry, writing, information literacy, or collaboration are core, practiced activities"]},
+ {id:"lc",name:"Learning Communities",codes:["ZLCP"],
+  look:"More than shared advisement:",
+  gates:[
+   "The same cohort of students is co-enrolled in two or more linked courses",
+   "The linked courses share an integrating theme or big question"]}
+];
+
+/* student-facing benefit lines for the share card */
+var CARD_BENEFITS={
+ collab:"Teamwork skills employers ask about in interviews",
+ writing:"Writing sharpened through real feedback and revision",
+ global:"Perspective that works across cultures and borders",
+ eport:"A portfolio of work you can show employers",
+ place:"Learning rooted in real places and communities",
+ ugr:"Hands-on research experience you can present",
+ intern:"Real workplace experience with mentoring",
+ service:"Real-world impact alongside community partners",
+ capstone:"A culminating project that shows what you can do",
+ cie:"A shared intellectual experience with your peers",
+ fye:"A strong start with close faculty connection",
+ lc:"A cohort of classmates learning alongside you"
+};
+
+/* modality branch for Diversity / Global Learning */
+var GLOBAL_MODES=[
+ {k:"class",label:"In the classroom (global/diversity content & interaction)",codes:["ZDGP"]},
+ {k:"ve",label:"Virtual exchange / COIL with an international partner class",codes:["ZIVE"]},
+ {k:"away",label:"Domestic travel — study away",codes:["ZSAW"]},
+ {k:"abroad",label:"International travel — study abroad",codes:["ZSAB"]}
+];
+var ABROAD_TYPES=[
+ {k:"led",label:"GSU faculty-led program",codes:["ZSAC"]},
+ {k:"exch",label:"Exchange program",codes:["ZSAK"]},
+ {k:"aff",label:"Third-party / affiliate provider",codes:["ZSAL"]}
+];
+
+/* ================= state ================= */
+function blankState(){return {course:"",term:"",instructor:"",crn:"",
+  syllabusName:"",naceNone:false,hipsNone:false,submitted:false,
+  nace:{},   /* ci -> {skills:{ii:true}, depth:k, open:bool} */
+  hips:{}    /* id -> {on:true, gates:{gi:true}, elems:{ei:{xi:true}}, grade:k, mode:k, abroad:k} */
+};}
+var S=blankState();
+var step=1, visited={1:true};
+
+function el(id){return document.getElementById(id);}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+function snack(m){var t=el("snackbar");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove("show");},2400);}
+
+/* ================= evaluation ================= */
+function naceEval(){
+  var out=[];
+  for(var ci=0;ci<COMPS.length;ci++){
+    var st=S.nace[ci];if(!st)continue;
+    var skills=[];for(var ii=0;ii<COMPS[ci].items.length;ii++)if(st.skills&&st.skills[ii])skills.push(COMPS[ci].items[ii]);
+    if(!skills.length)continue;
+    var depth=st.depth||null;
+    var d=DEPTHS.filter(function(x){return x.k===depth;})[0]||null;
+    out.push({name:COMPS[ci].name,skills:skills,depth:depth,tag:d?d.tag:null,needsDepth:!depth});
+  }
+  return out;
+}
+function hipDef(id){for(var i=0;i<HIPS.length;i++)if(HIPS[i].id===id)return HIPS[i];return null;}
+function hipEval(id){
+  var st=S.hips[id];if(!st||!st.on)return null;
+  var def=hipDef(id);
+  var missing=[];
+  for(var gi=0;gi<def.gates.length;gi++)if(!(st.gates&&st.gates[gi]))missing.push(def.gates[gi]);
+  var es1=elemState(st,0), es2=elemState(st,1);
+  if(!es1.met)missing.push("Element 1 — "+ELEMENTS[0].s+": check at least "+es1.need+" indicators ("+es1.n+" checked)");
+  if(!es2.met)missing.push("Element 2 — "+ELEMENTS[1].s+": check at least "+es2.need+" indicators ("+es2.n+" checked)");
+  var e38=false;for(var ei=2;ei<8;ei++)if(elemState(st,ei).met)e38=true;
+  if(!e38)missing.push("At least one of elements 3–8 fully in place (substantive interaction, feedback, reflection, real-world application, …)");
+  var gb=gradeBand(st.grade);
+  if(!gb)missing.push("Grade weight: tell us the share of the overall grade tied to this practice");
+  else if(!gb.ok)missing.push("GSU requirement: work tied to this practice must count for at least 20% of the overall course grade (currently "+gb.label.toLowerCase()+")");
+  var needMode=def.branch&&!st.mode;
+  var needAbroad=def.branch&&st.mode==="abroad"&&!st.abroad;
+  if(needMode)missing.push("Choose how students engage globally (modality)");
+  if(needAbroad)missing.push("Choose the study-abroad program type");
+  var qualifies=missing.length===0;
+  var codes=def.codes.slice();
+  if(def.branch&&st.mode){
+    var m=GLOBAL_MODES.filter(function(x){return x.k===st.mode;})[0];
+    if(m)codes=codes.concat(m.codes);
+    if(st.mode==="abroad"&&st.abroad){
+      var a=ABROAD_TYPES.filter(function(x){return x.k===st.abroad;})[0];
+      if(a)codes=codes.concat(a.codes);
+    }
+  }
+  return {def:def,qualifies:qualifies,missing:missing,codes:qualifies?codes:[],review:!!def.review};
+}
+function allEvals(){
+  var out=[];
+  for(var i=0;i<HIPS.length;i++){var e=hipEval(HIPS[i].id);if(e)out.push(e);}
+  return out;
+}
+function finalCodes(){
+  var evs=allEvals(),set=[],any=false,review=false;
+  evs.forEach(function(e){
+    if(e.qualifies){any=true;if(e.review)review=true;
+      e.codes.forEach(function(c){if(set.indexOf(c)<0)set.push(c);});}
+  });
+  if(any&&set.indexOf("ZHIR")<0)set.push("ZHIR");
+  return {codes:set,review:review};
+}
+
+/* ================= rendering: rail ================= */
+function chipCode(c){
+  var info=CODES[c]||{d:""};
+  return '<span class="chip code'+(info.pending?' pending':'')+'" title="'+esc(info.d)+'">'+esc(c)+'</span>';
+}
+function renderRail(){
+  if(!el("rail-nace"))return; /* rail removed from UI; kept as no-op */
+  var fc=finalCodes();
+  var h="";
+  if(fc.codes.length){h='<div class="chips">'+fc.codes.map(chipCode).join("")+
+    (fc.review?'<span class="chip review">Manual review</span>':'')+'</div>';}
+  else if(fc.review){h='<div class="chips"><span class="chip review">Manual review</span></div>';}
+  else h='<span class="none">Verified HIPs add codes here.</span>';
+  el("rail-codes").innerHTML=h;
+
+  var nv=naceEval(),nh="";
+  if(nv.length){
+    nh='<div class="chips">'+nv.map(function(n){
+      if(n.needsDepth)return '<span class="chip warnchip">'+esc(shortComp(n.name))+' — set depth</span>';
+      if(!n.tag)return '<span class="chip warnchip">'+esc(shortComp(n.name))+' — intro only</span>';
+      return '<span class="chip tag'+(n.tag==="Practiced"?" prac":"")+'">'+esc(shortComp(n.name))+' · '+n.tag+'</span>';
+    }).join("")+'</div>';
+  }else nh='<span class="none">Pick skills to see competency tags.</span>';
+  el("rail-nace").innerHTML=nh;
+
+  var emg=allEvals().filter(function(e){return !e.qualifies;});
+  el("rail-emg-wrap").style.display=emg.length?"block":"none";
+  el("rail-emg").innerHTML='<div class="chips">'+emg.map(function(e){
+    return '<span class="chip warnchip">'+esc(e.def.name)+'</span>';}).join("")+'</div>';
+}
+function shortComp(n){return n.split("/")[0];}
+
+/* ================= rendering: NACE ================= */
+function renderNace(){
+  var h="";
+  for(var ci=0;ci<COMPS.length;ci++){
+    var c=COMPS[ci],st=S.nace[ci]||{},n=0;
+    if(st.skills)for(var k in st.skills)if(st.skills[k])n++;
+    h+='<div class="cbox'+(st.open?" open":"")+'" id="nc-'+ci+'">'+
+      '<button type="button" class="head" aria-expanded="'+(!!st.open)+'" onclick="ncToggle('+ci+')">'+
+      '<span class="skewname skew blue">'+esc(c.name)+'</span>'+
+      '<span class="cnt'+(n?"":" zero")+'">'+n+'</span>'+
+      '<img src="'+ICON_BASE+c.icon+'" alt="" onerror="this.style.display=\'none\'">'+
+      '<span class="chev">›</span></button><div class="items">';
+    for(var ii=0;ii<c.items.length;ii++){
+      h+='<label class="sk"><input type="checkbox" '+(st.skills&&st.skills[ii]?"checked":"")+
+        ' onchange="ncSkill('+ci+','+ii+',this.checked)"><span class="st">'+esc(c.items[ii])+'</span></label>';
+    }
+    if(n){
+      h+='<div class="depth"><span class="q">How do students engage these skills?</span>';
+      for(var di=0;di<DEPTHS.length;di++){
+        h+='<button type="button" class="'+(st.depth===DEPTHS[di].k?"on":"")+'" onclick="ncDepth('+ci+',\''+DEPTHS[di].k+'\')">'+esc(DEPTHS[di].label)+'</button>';
+      }
+      var dh=DEPTHS.filter(function(x){return x.k===st.depth;})[0];
+      h+='<span class="dhint">'+(dh?esc(dh.hint):"Choose one — this sets the tag level.")+'</span></div>';
+    }
+    h+='</div></div>';
+  }
+  el("nace-boxes").innerHTML=h;
+}
+function ncToggle(ci){if(!S.nace[ci])S.nace[ci]={};S.nace[ci].open=!S.nace[ci].open;renderNace();}
+function ncSkill(ci,ii,on){
+  if(!S.nace[ci])S.nace[ci]={open:true};
+  if(!S.nace[ci].skills)S.nace[ci].skills={};
+  S.nace[ci].skills[ii]=on;
+  if(on){S.naceNone=false;syncNoneBoxes();}
+  renderNace();renderRail();
+}
+function ncDepth(ci,k){S.nace[ci].depth=k;renderNace();renderRail();}
+
+/* ================= rendering: HIPs ================= */
+function renderScreener(){
+  var h="";
+  for(var i=0;i<HIPS.length;i++){
+    var on=S.hips[HIPS[i].id]&&S.hips[HIPS[i].id].on;
+    h+='<button type="button" class="'+(on?"on":"")+'" onclick="hpToggle(\''+HIPS[i].id+'\')">'+esc(HIPS[i].name)+'</button>';
+  }
+  el("hip-screener").innerHTML=h;
+}
+function hpToggle(id){
+  if(!S.hips[id])S.hips[id]={};
+  S.hips[id].on=!S.hips[id].on;
+  if(S.hips[id].on){S.hipsNone=false;syncNoneBoxes();}
+  renderScreener();renderPanels();renderRail();
+}
+function renderPanels(){
+  var h="";
+  for(var i=0;i<HIPS.length;i++){
+    var def=HIPS[i],st=S.hips[def.id];
+    if(!st||!st.on)continue;
+    var ev=hipEval(def.id);
+    h+='<div class="vpanel" id="vp-'+def.id+'">'+
+      '<div class="vhead"><span class="skewname skew blue">'+esc(def.name)+'</span>'+
+      '<span class="vstatus '+(ev.qualifies?"ok":"no")+'">'+(ev.qualifies?(def.review?"✓ HIP — manual review":"✓ Meets HIP criteria"):"Not yet at HIP level")+'</span></div>'+
+      '<div class="vbody">';
+    /* Part A : defining criteria */
+    h+='<div class="vpart"><p class="pt"><b>Part A</b> · Is it the practice?</p>'+
+      '<p class="pdesc">'+esc(def.look)+' check each statement that is true for this course.</p>';
+    for(var gi=0;gi<def.gates.length;gi++){
+      h+='<label class="sk"><input type="checkbox" '+(st.gates&&st.gates[gi]?"checked":"")+
+        ' onchange="hpGate(\''+def.id+'\','+gi+',this.checked)"><span class="st">'+esc(def.gates[gi])+'</span></label>';
+    }
+    h+='</div>';
+    /* GSU grade-weight requirement */
+    h+='<div class="depth" style="margin:12px 2px 0"><span class="q">About how much of the overall course grade is tied to this practice?</span>';
+    for(var bi=0;bi<GRADE_BANDS.length;bi++){
+      h+='<button type="button" class="'+(st.grade===GRADE_BANDS[bi].k?"on":"")+'" onclick="hpGrade(\''+def.id+'\',\''+GRADE_BANDS[bi].k+'\')">'+GRADE_BANDS[bi].label+'</button>';
+    }
+    h+='<span class="dhint">GSU requires a HIP to carry at least 20% of the overall course grade.</span></div>';
+    /* branch for global learning */
+    if(def.branch){
+      h+='<div class="branch"><p class="q">How do students engage globally in this course?</p>';
+      for(var mi=0;mi<GLOBAL_MODES.length;mi++){
+        var m=GLOBAL_MODES[mi];
+        h+='<label><input type="radio" name="gmode" '+(st.mode===m.k?"checked":"")+
+          ' onchange="hpMode(\''+def.id+'\',\''+m.k+'\')"><span>'+esc(m.label)+
+          ' <span class="codehint">'+m.codes.join(" ")+(CODES[m.codes[0]]&&CODES[m.codes[0]].pending?" (new USG code)":"")+'</span></span></label>';
+      }
+      if(st.mode==="abroad"){
+        h+='<p class="q" style="margin-top:8px">What kind of study-abroad program?</p>';
+        for(var ai=0;ai<ABROAD_TYPES.length;ai++){
+          var a=ABROAD_TYPES[ai];
+          h+='<label><input type="radio" name="gabroad" '+(st.abroad===a.k?"checked":"")+
+            ' onchange="hpAbroad(\''+def.id+'\',\''+a.k+'\')"><span>'+esc(a.label)+
+            ' <span class="codehint">ZSAB + '+a.codes.join(" ")+(CODES[a.codes[0]]&&CODES[a.codes[0]].pending?" (new USG code)":"")+'</span></span></label>';
+        }
+      }
+      h+='</div>';
+    }
+    /* Part B : elements, each verified through concrete indicators */
+    h+='<div class="vpart"><p class="pt"><b>Part B</b> · Does it work like a HIP?</p>'+
+      '<p class="pdesc">Research identifies eight elements that make these experiences powerful — but each one means something concrete. '+
+      'Check what is actually true of <b>this course</b>; an element counts once enough of its indicators are in place. '+
+      'A HIP needs both required elements plus at least one more — and at GSU, at least 20% of the overall grade tied to it.</p><div class="vgrid">';
+    for(var ei=0;ei<ELEMENTS.length;ei++){
+      var E=ELEMENTS[ei],es=elemState(st,ei);
+      h+='<div class="eblock'+(es.met?" met":"")+'" id="eb-'+def.id+'-'+ei+'">'+
+        '<div class="ehead"><span class="et">'+(ei+1)+'. '+esc(E.t)+
+        (E.req?'<span class="req">Required</span>':'')+'</span>'+
+        '<span class="emet '+(es.met?"y":"")+'">'+(es.met?"✓ in place":es.n+" of "+es.need)+'</span></div>';
+      for(var xi=0;xi<E.inds.length;xi++){
+        h+='<label class="sk ind"><input type="checkbox" '+(st.elems&&st.elems[ei]&&st.elems[ei][xi]?"checked":"")+
+          ' onchange="hpElem(\''+def.id+'\','+ei+','+xi+',this.checked)"><span class="st">'+esc(E.inds[xi])+'</span></label>';
+      }
+      h+='</div>';
+    }
+    h+='</div></div>';
+    if(def.review){
+      h+='<p class="pdesc" style="margin-top:10px;color:var(--warn)">Place-Based Learning doesn&rsquo;t have a Banner attribute code yet — if it qualifies, it&rsquo;s flagged for manual review.</p>';
+    }
+    h+='</div></div>';
+  }
+  if(!h){
+    var any=false;for(var k in S.hips)if(S.hips[k]&&S.hips[k].on)any=true;
+    if(!any)h='<p class="secsub" style="font-style:italic">No practices selected — that&rsquo;s a fine answer. Continue to your results.</p>';
+  }
+  el("hip-panels").innerHTML=h;
+}
+function hpGate(id,gi,on){if(!S.hips[id].gates)S.hips[id].gates={};S.hips[id].gates[gi]=on;refreshPanel(id);}
+function hpElem(id,ei,xi,on){
+  if(!S.hips[id].elems)S.hips[id].elems={};
+  if(!S.hips[id].elems[ei])S.hips[id].elems[ei]={};
+  S.hips[id].elems[ei][xi]=on;
+  var es=elemState(S.hips[id],ei),eb=el("eb-"+id+"-"+ei);
+  if(eb){eb.classList.toggle("met",es.met);
+    var pill=eb.querySelector(".emet");
+    pill.className="emet "+(es.met?"y":"");
+    pill.textContent=es.met?"✓ in place":es.n+" of "+es.need;}
+  refreshPanel(id);
+}
+function hpGrade(id,k){S.hips[id].grade=k;renderPanels();renderRail();}
+function hpMode(id,k){S.hips[id].mode=k;if(k!=="abroad")delete S.hips[id].abroad;renderPanels();renderRail();}
+function hpAbroad(id,k){S.hips[id].abroad=k;renderPanels();renderRail();}
+function refreshPanel(id){
+  var ev=hipEval(id),p=el("vp-"+id);
+  if(p){var s=p.querySelector(".vstatus");
+    s.className="vstatus "+(ev.qualifies?"ok":"no");
+    s.textContent=ev.qualifies?(ev.review?"✓ HIP — manual review":"✓ Meets HIP criteria"):"Not yet at HIP level";}
+  renderRail();
+}
+
+/* ================= rendering: results ================= */
+function renderResults(){
+  var fc=finalCodes(),evs=allEvals(),nv=naceEval();
+  var h="";
+
+  if(S.submitted)h+='<div class="callout ok">✓ Submitted. '+esc(S.syllabusName||"Your syllabus")+' and your survey are on their way to the portal. Codes below are applied to the course record in Banner.</div>';
+
+  /* codes card */
+  h+='<div class="res"><h3>Banner attribute codes applied</h3>'+
+    '<p class="rsub">For the record-keepers: these attribute codes tag the course in Banner. Dashed codes are new USG codes still being integrated at GSU — recorded now, applied when integration is complete.</p>';
+  if(fc.codes.length){
+    fc.codes.forEach(function(c){
+      var info=CODES[c];
+      h+='<div class="codeline"><span class="cc">'+chipCode(c)+'</span><span class="cd">'+esc(info.d)+
+        (info.pending?'<small>New USG code — GSU integration in progress</small>':'')+'</span></div>';
+    });
+    if(fc.review)h+='<div class="codeline"><span class="cc"><span class="chip review">Manual review</span></span><span class="cd">Place-Based Learning qualifies but has no Banner code yet — flagged for manual tagging.</span></div>';
+  }else if(fc.review){
+    h+='<div class="codeline"><span class="cc"><span class="chip review">Manual review</span></span><span class="cd">Place-Based Learning qualifies but has no Banner code yet — flagged for manual tagging.</span></div>';
+  }else{
+    h+='<p class="rsub" style="font-style:italic;margin:0">No HIP codes from this survey. If you expected one, revisit step 3 — the &ldquo;emerging&rdquo; notes below show what&rsquo;s missing.</p>';
+  }
+  h+='</div>';
+
+  /* emerging card */
+  var emg=evs.filter(function(e){return !e.qualifies;});
+  if(emg.length){
+    h+='<div class="res"><h3>Close, but not yet a HIP</h3>'+
+      '<p class="rsub">These practices are present in your course but don&rsquo;t yet meet the research bar. Nothing here is tagged.</p>';
+    emg.forEach(function(e){
+      h+='<div class="emg"><span class="en">'+esc(e.def.name)+'</span><ul class="misslist">'+
+        e.missing.map(function(m){return '<li>'+esc(m)+'</li>';}).join("")+'</ul></div>';
+    });
+    h+='<p class="rsub" style="margin:10px 0 0">Want to close the gap? <a href="https://cetloe.gsu.edu/instructor-resources/high-impact-practices/">More on High-Impact Practices at GSU →</a></p></div>';
+  }
+
+  /* NACE card */
+  h+='<div class="res"><h3>Career-ready skill tags</h3>'+
+    '<p class="rsub">Feeds GSU&rsquo;s College to Career skill mapping. &ldquo;Assessed&rdquo; = practiced in graded work; &ldquo;Practiced&rdquo; = used but not graded. Introduced-only competencies aren&rsquo;t tagged.</p>';
+  if(nv.length){
+    nv.forEach(function(n){
+      var chip=n.needsDepth?'<span class="chip warnchip">set depth in step 2</span>':
+        (n.tag?'<span class="chip tag'+(n.tag==="Practiced"?" prac":"")+'">'+n.tag+'</span>':'<span class="chip warnchip">introduced only — not tagged</span>');
+      h+='<div class="codeline"><span class="cd" style="flex:1"><b>'+esc(n.name)+'</b> '+chip+
+        '<small>'+esc(n.skills.join(" · "))+'</small></span></div>';
+    });
+  }else{
+    h+='<p class="rsub" style="font-style:italic;margin:0">No competencies selected.</p>';
+  }
+  h+='</div>';
+
+  /* share card */
+  h+='<div class="res"><h3>Share the career value with your students</h3>'+
+    '<p class="rsub">A ready-to-post card for iCollege or LinkedIn that shows students the career-related value built into this course. '+
+    'Only verified skills and qualifying High-Impact Practices appear. Copy the alt text below when you post it, so the card is accessible to screen-reader users.</p>'+
+    '<div id="sharebody"></div></div>';
+
+  el("results").innerHTML=h;
+  renderShareCard();
+}
+
+/* ================= share card (canvas) ================= */
+var flameImg=new Image();
+flameImg.src=FLAME_URI;
+flameImg.onload=function(){if(step===4)renderShareCard();};
+
+function cardContent(){
+  var skills=naceEval().filter(function(n){return n.tag;}).map(function(n){
+    return {name:n.name,level:n.tag==="Assessed"?"graded work":"practiced"};});
+  var hips=allEvals().filter(function(e){return e.qualifies;}).map(function(e){
+    return {name:e.def.name,why:CARD_BENEFITS[e.def.id]||""};});
+  return {skills:skills,hips:hips};
+}
+function cardAltText(){
+  var c=cardContent(),parts=[];
+  parts.push("Card titled “What you’ll gain in this course” for "+(S.course||"this course")+
+    (S.term?", "+S.term:"")+", Georgia State University.");
+  if(c.skills.length)parts.push("Career-ready skills: "+c.skills.map(function(s){return s.name+" ("+s.level+")";}).join("; ")+".");
+  if(c.hips.length)parts.push("High-impact experiences: "+c.hips.map(function(p){return p.name+" — "+p.why;}).join("; ")+".");
+  parts.push("These experiences meet research-based quality standards for High-Impact Practices. Georgia State University.");
+  return parts.join(" ");
+}
+function wrapLines(ctx,text,maxW){
+  var words=String(text).split(/\s+/),lines=[],line="";
+  for(var i=0;i<words.length;i++){
+    var t=line?line+" "+words[i]:words[i];
+    if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=words[i];}
+    else line=t;
+  }
+  if(line)lines.push(line);
+  return lines;
+}
+function skewBanner(ctx,x,y,w,h){
+  var k=h*0.27;
+  ctx.fillStyle="#003986";
+  ctx.beginPath();ctx.moveTo(x+k,y);ctx.lineTo(x+w+k,y);ctx.lineTo(x+w,y+h);ctx.lineTo(x,y+h);ctx.closePath();ctx.fill();
+}
+var FONT='-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif';
+function buildCard(fmt){
+  var W=fmt==="square"?1080:1200,H=fmt==="square"?1080:627,SC=2;
+  var cv=document.createElement("canvas");cv.width=W*SC;cv.height=H*SC;
+  var ctx=cv.getContext("2d");ctx.scale(SC,SC);
+  var c=cardContent(),M=52;
+
+  ctx.fillStyle="#ffffff";ctx.fillRect(0,0,W,H);
+  ctx.textBaseline="alphabetic";
+
+  /* brand row */
+  var y=M+8;
+  if(flameImg.complete&&flameImg.naturalWidth){
+    var fh=54,fw=fh*flameImg.naturalWidth/flameImg.naturalHeight;
+    ctx.drawImage(flameImg,M,y-40,fw,fh);
+    var bx=M+fw+16;
+    ctx.fillStyle="#003986";ctx.font="700 24px "+FONT;
+    ctx.fillText("Georgia State University",bx,y-4);
+  }
+  y+=44;
+
+  /* headline banner */
+  ctx.font="700 33px "+FONT;
+  var head="What you’ll gain in this course";
+  var bw=ctx.measureText(head).width+56;
+  skewBanner(ctx,M,y,bw,58);
+  ctx.fillStyle="#ffffff";ctx.fillText(head,M+34,y+40);
+  y+=98;
+
+  /* course line */
+  ctx.fillStyle="#1b1f2a";ctx.font="700 28px "+FONT;
+  var courseLine=(S.course||"Your course")+(S.term?"  ·  ":"");
+  ctx.fillText(courseLine,M,y);
+  if(S.term){
+    var cw=ctx.measureText(courseLine).width;
+    ctx.fillStyle="#5a6273";ctx.font="500 26px "+FONT;
+    ctx.fillText(S.term,M+cw,y);
+  }
+  y+=26;
+
+  /* columns (or stacked for square) */
+  var colGap=44;
+  var twoCol=fmt!=="square"&&c.skills.length&&c.hips.length;
+  var colW=twoCol?(W-2*M-colGap)/2:W-2*M;
+  var xL=M,xR=M+colW+colGap;
+  var yL=y+34,yR=y+34;
+
+  function sectionLabel(x,yy,t){
+    ctx.fillStyle="#003986";ctx.font="700 17px "+FONT;
+    ctx.fillText(t.toUpperCase().split("").join(" "),x,yy);
+    return yy+18;
+  }
+  function drawSkills(x,yy,w){
+    if(!c.skills.length)return yy;
+    yy=sectionLabel(x,yy,"Career-ready skills");
+    var cx=x,ch=38,pad=14,gap=10;yy+=10;
+    for(var i=0;i<c.skills.length;i++){
+      var s=c.skills[i];
+      ctx.font="600 19px "+FONT;var nw=ctx.measureText(s.name).width;
+      ctx.font="700 16px "+FONT;var lw=ctx.measureText(s.level).width;
+      var tw=nw+lw+pad*2+10;
+      if(cx+tw>x+w&&cx>x){cx=x;yy+=ch+gap;}
+      ctx.strokeStyle="#003986";ctx.lineWidth=2;
+      ctx.beginPath();
+      if(ctx.roundRect)ctx.roundRect(cx,yy,tw,ch,10);else ctx.rect(cx,yy,tw,ch);
+      ctx.stroke();
+      ctx.fillStyle="#1b1f2a";ctx.font="600 19px "+FONT;ctx.fillText(s.name,cx+pad,yy+26);
+      ctx.fillStyle="#003986";ctx.font="700 16px "+FONT;ctx.fillText(s.level,cx+pad+nw+10,yy+25);
+      cx+=tw+gap;
+    }
+    return yy+ch+8;
+  }
+  function drawHips(x,yy,w,maxItems){
+    if(!c.hips.length)return yy;
+    yy=sectionLabel(x,yy,"High-impact experiences");
+    yy+=16;
+    var shown=c.hips.slice(0,maxItems),extra=c.hips.length-shown.length;
+    for(var i=0;i<shown.length;i++){
+      var p=shown[i];
+      ctx.fillStyle="#c8102e";
+      ctx.fillRect(x,yy-2,6,24);
+      ctx.fillStyle="#1b1f2a";ctx.font="700 22px "+FONT;
+      ctx.fillText(p.name,x+18,yy+16);
+      yy+=28;
+      ctx.fillStyle="#3a4150";ctx.font="500 19px "+FONT;
+      var ls=wrapLines(ctx,p.why,w-18);
+      for(var li=0;li<ls.length;li++){ctx.fillText(ls[li],x+18,yy+14);yy+=25;}
+      yy+=16;
+    }
+    if(extra>0){
+      ctx.fillStyle="#5a6273";ctx.font="600 18px "+FONT;
+      ctx.fillText("+ "+extra+" more high-impact experience"+(extra>1?"s":""),x,yy+10);
+      yy+=30;
+    }
+    return yy;
+  }
+
+  if(twoCol){yL=drawSkills(xL,yL,colW);yR=drawHips(xR,yR,colW,4);}
+  else{
+    var yy=y+34;
+    yy=drawSkills(M,yy,colW)+24;
+    yy=drawHips(M,yy,colW,fmt==="square"?6:4);
+  }
+
+  /* footer */
+  ctx.strokeStyle="#e3e7ee";ctx.lineWidth=1;
+  ctx.beginPath();ctx.moveTo(M,H-64);ctx.lineTo(W-M,H-64);ctx.stroke();
+  ctx.fillStyle="#5a6273";ctx.font="500 17px "+FONT;
+  ctx.fillText("These experiences meet research-based quality standards for High-Impact Practices",M,H-32);
+  return cv;
+}
+function renderShareCard(){
+  var body=el("sharebody");if(!body)return;
+  var c=cardContent();
+  if(!c.skills.length&&!c.hips.length){
+    body.innerHTML='<p class="rsub" style="font-style:italic;margin:0">Tag at least one career-ready skill or qualifying High-Impact Practice to generate a share card.</p>';
+    return;
+  }
+  body.innerHTML='<div class="mf" style="max-width:360px;margin:0 0 14px"><label for="cardlabel">Course name on the card (optional)</label>'+
+    '<input id="cardlabel" value="'+esc(S.course)+'" placeholder="e.g., BIOL 4570 — Field Ecology" oninput="cardLabel(this.value)"></div>'+
+    '<div class="sharewrap" id="cardprev"></div>'+
+    '<div class="sharebtns">'+
+    '<button class="btn stroked" onclick="downloadCard(\'linkedin\')">Download for LinkedIn (1200×627)</button>'+
+    '<button class="btn stroked" onclick="downloadCard(\'square\')">Download square (1080×1080)</button>'+
+    '</div>'+
+    '<p class="altlabel">Alt text for accessibility — paste when you post <button class="btn text" style="padding:4px 10px;font-size:12px" onclick="copyAlt()">Copy</button></p>'+
+    '<textarea class="alttext" id="alttext" readonly aria-label="Generated alt text for the share card"></textarea>';
+  el("cardprev").appendChild(buildCard("linkedin"));
+  el("alttext").value=cardAltText();
+}
+function cardLabel(v){
+  S.course=v;
+  var p=el("cardprev");
+  if(p){p.innerHTML="";p.appendChild(buildCard("linkedin"));}
+  var a=el("alttext");
+  if(a)a.value=cardAltText();
+}
+function downloadCard(fmt){
+  var cv=buildCard(fmt);
+  cv.toBlob(function(blob){
+    var a=document.createElement("a");
+    a.href=URL.createObjectURL(blob);
+    a.download=(S.course?S.course.replace(/[^\w\- ]+/g,"").trim().replace(/\s+/g,"-"):"course")+"-career-card-"+(fmt==="square"?"1080x1080":"1200x627")+".png";
+    document.body.appendChild(a);a.click();document.body.removeChild(a);
+    snack("Card downloaded — don’t forget the alt text!");
+  },"image/png");
+}
+function copyAlt(){
+  var t=el("alttext");t.select();
+  var done=function(){snack("Alt text copied.");};
+  if(navigator.clipboard){navigator.clipboard.writeText(t.value).then(done,function(){try{document.execCommand("copy");}catch(e){}done();});}
+  else{try{document.execCommand("copy");}catch(e){}done();}
+}
+
+/* ================= completeness (submit gate) ================= */
+function selectedHips(){var out=[];for(var i=0;i<HIPS.length;i++){var st=S.hips[HIPS[i].id];if(st&&st.on)out.push(HIPS[i]);}return out;}
+function completeness(){
+  var blockers=[];
+  if(!S.syllabusName)blockers.push({msg:"Attach your syllabus file",step:1});
+  var nv=naceEval(),undepth=nv.filter(function(n){return n.needsDepth;});
+  if(!nv.length&&!S.naceNone)blockers.push({msg:"Career-ready skills: tag at least one competency — or confirm none apply",step:2});
+  undepth.forEach(function(n){blockers.push({msg:"Set how students engage "+shortComp(n.name)+" skills",step:2});});
+  var sel=selectedHips();
+  if(!sel.length&&!S.hipsNone)blockers.push({msg:"High-Impact Practices: select what happens in this course — or confirm none apply",step:3});
+  sel.forEach(function(def){
+    if(!gradeBand(S.hips[def.id].grade))blockers.push({msg:"Set the grade share for "+def.name,step:3});
+  });
+  return blockers;
+}
+
+/* ================= navigation ================= */
+function go(n){
+  if(n===5&&!S.submitted){snack("Submit your syllabus first — step 4.");n=4;}
+  step=n;visited[n]=true;
+  el("view-0").classList.toggle("on",n===0);
+  el("stepper").style.display=n===0?"none":"flex";
+  for(var i=1;i<=5;i++){
+    el("view-"+i).classList.toggle("on",i===n);
+    var b=el("stbtn-"+i);
+    b.classList.toggle("on",i===n);
+    b.classList.toggle("done",i<n&&isDone(i));
+  }
+  if(n===2)renderNace();
+  if(n===3){renderScreener();renderPanels();}
+  if(n===4)renderSubmit();
+  if(n===5)renderResults();
+  syncNoneBoxes();
+  renderRail();
+  window.scrollTo(0,0);
+}
+function isDone(i){
+  if(i===1)return !!S.syllabusName;
+  if(i===2)return S.naceNone||(naceEval().length>0&&!naceEval().some(function(n){return n.needsDepth;}));
+  if(i===3){var sel=selectedHips();return S.hipsNone||(sel.length>0&&sel.every(function(d){return !!gradeBand(S.hips[d.id].grade);}));}
+  if(i===4)return S.submitted;
+  return false;
+}
+function fld(k,v){S[k]=v;renderRail();}
+function sylFile(inp){
+  var f=inp.files&&inp.files[0];
+  S.syllabusName=f?f.name:"";
+  var t=el("f-sylname");
+  t.textContent=f?f.name+"  ("+Math.max(1,Math.round(f.size/1024))+" KB)":"No file attached";
+  t.classList.toggle("on",!!f);
+  var note=el("sylread");
+  if(note){note.style.display="none";note.textContent="";}
+  if(f)readSyllabus(f);
+}
+
+/* ===== read course details out of the attached syllabus =====
+   Dependency-free: .txt/.html read directly; .docx is a zip whose
+   word/document.xml we inflate with the browser's DecompressionStream;
+   .pdf text is pulled from Flate streams' Tj/TJ operators (best effort —
+   scanned or unusually encoded PDFs fail gracefully). Parsed fields fill
+   only what's still empty, so portal hand-off values always win. */
+function inflateBytes(bytes,fmt){
+  var ds=new DecompressionStream(fmt);
+  return new Response(new Blob([bytes]).stream().pipeThrough(ds)).arrayBuffer()
+    .then(function(b){return new Uint8Array(b);});
+}
+async function docxText(file){
+  var buf=new Uint8Array(await file.arrayBuffer());
+  var dv=new DataView(buf.buffer),td=new TextDecoder(),i=0;
+  while(i<buf.length-30){
+    if(dv.getUint32(i,true)!==0x04034b50){i++;continue;}
+    var method=dv.getUint16(i+8,true),csize=dv.getUint32(i+18,true);
+    var nlen=dv.getUint16(i+26,true),xlen=dv.getUint16(i+28,true);
+    var name=td.decode(buf.subarray(i+30,i+30+nlen));
+    var dstart=i+30+nlen+xlen;
+    if(name==="word/document.xml"){
+      var data=buf.subarray(dstart,dstart+(csize||buf.length-dstart));
+      var xb=method===8?await inflateBytes(data,"deflate-raw"):data;
+      return new TextDecoder("utf-8").decode(xb)
+        .replace(/<\/w:p>/g,"\n").replace(/<[^>]+>/g,"")
+        .replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">")
+        .replace(/&quot;/g,'"').replace(/&apos;/g,"'");
+    }
+    i=dstart+(csize||1);
+  }
+  return "";
+}
+function pdfUnescape(s){
+  return s.replace(/\\([0-7]{1,3}|.)/g,function(m,g){
+    if(/^[0-7]+$/.test(g))return String.fromCharCode(parseInt(g,8));
+    if(g==="n")return "\n";if(g==="r")return "\r";if(g==="t")return "\t";
+    return g;
+  });
+}
+function hexUtf16(h){
+  var out="";
+  for(var i=0;i+3<h.length;i+=4)out+=String.fromCharCode(parseInt(h.substr(i,4),16));
+  return out;
+}
+function parseCMap(s){
+  /* ToUnicode CMap: maps a font's internal glyph IDs back to real characters */
+  var mp={},m;
+  var rc=/beginbfchar([\s\S]*?)endbfchar/g;
+  while((m=rc.exec(s))){
+    var re=/<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>/g,x;
+    while((x=re.exec(m[1])))mp[parseInt(x[1],16)]=hexUtf16(x[2]);
+  }
+  var rr=/beginbfrange([\s\S]*?)endbfrange/g;
+  while((m=rr.exec(s))){
+    var re=/<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>\s*<([0-9A-Fa-f]+)>/g,x;
+    while((x=re.exec(m[1]))){
+      var lo=parseInt(x[1],16),hi=Math.min(parseInt(x[2],16),lo+65535),base=parseInt(x[3],16);
+      for(var g=lo;g<=hi;g++)mp[g]=String.fromCharCode(base+g-lo);
+    }
+  }
+  return mp;
+}
+async function pdfToUnicodeMaps(buf,raw){
+  /* font resource name (/F4 …) -> decoded ToUnicode map, walking /Font<<…>> dicts */
+  var maps={},fontRefs={},idx=0;
+  while(true){
+    var f=raw.indexOf("/Font",idx);if(f<0)break;
+    var open=raw.indexOf("<<",f);
+    if(open>=0&&open-f<12){
+      var depth=1,i=open+2;
+      while(i<raw.length&&depth>0){
+        if(raw.substr(i,2)==="<<"){depth++;i+=2;}
+        else if(raw.substr(i,2)===">>"){depth--;i+=2;}
+        else i++;
+      }
+      var dict=raw.slice(open,i),re=/\/([^\s\/<>\[\]()]+)\s+(\d+)\s+0\s+R/g,m;
+      while((m=re.exec(dict)))fontRefs[m[1]]=m[2];
+    }
+    idx=f+5;
+  }
+  function objSpan(num){
+    var mm=new RegExp("(?:^|[^0-9])"+num+"\\s+0\\s+obj").exec(raw);
+    if(!mm)return null;
+    var st=mm.index+mm[0].length,en=raw.indexOf("endobj",st);
+    return en<0?null:[st,en];
+  }
+  for(var name in fontRefs){
+    var sp=objSpan(fontRefs[name]);if(!sp)continue;
+    var tm=/\/ToUnicode\s+(\d+)\s+0\s+R/.exec(raw.slice(sp[0],sp[1]));if(!tm)continue;
+    var csp=objSpan(tm[1]);if(!csp)continue;
+    var cs=raw.indexOf("stream",csp[0]);if(cs<0||cs>csp[1])continue;
+    var ds=cs+6;if(raw[ds]==="\r")ds++;if(raw[ds]==="\n")ds++;
+    var de=raw.indexOf("endstream",ds);if(de<0)continue;
+    var data=await tryInflatePdfStream(buf.subarray(ds,de));
+    maps[name]=parseCMap(data||raw.slice(ds,de));
+  }
+  return maps;
+}
+function pdfOps(s,tou){
+  tou=tou||{};
+  var out="",cur=null,m;
+  var re=/\/([^\s\/<>\[\]()]+)\s+[\d.]+\s+Tf|\((?:\\.|[^\\()])*\)|<([0-9A-Fa-f\s]+)>|(-?[\d.]+)\s+(-?[\d.]+)\s+T[dD]\b|T\*|\bBT\b|\bET\b/g;
+  while((m=re.exec(s))){
+    var tok=m[0];
+    if(m[1])cur=m[1];
+    else if(tok[0]==="(")out+=pdfUnescape(tok.slice(1,-1));
+    else if(tok[0]==="<"){
+      var h=m[2].replace(/\s+/g,""),map=cur&&tou[cur];
+      if(map){for(var i=0;i+3<h.length;i+=4)out+=map[parseInt(h.substr(i,4),16)]||"";}
+      else{
+        var t="";
+        for(var j=0;j+1<h.length;j+=2){var c=parseInt(h.substr(j,2),16);t+=c>=32&&c<127?String.fromCharCode(c):" ";}
+        if(t&&t.replace(/ /g,"").length>t.length*0.8)out+=t.replace(/ /g,"");
+      }
+    }
+    else if(m[3]!==undefined)out+=Math.abs(parseFloat(m[4]))>0.5?"\n":" ";
+    else out+="\n";
+  }
+  /* collapse letter-spaced runs from per-glyph kerning: "A B C 1 2 3" -> "ABC123" */
+  return out.replace(/(?:\b[A-Za-z0-9] ){2,}[A-Za-z0-9]\b/g,function(r){return r.replace(/ /g,"");});
+}
+async function tryInflatePdfStream(bytes){
+  /* PDF streams may carry an EOL before "endstream" that isn't part of the
+     compressed data; DecompressionStream rejects trailing junk, so retry stripped */
+  var end=bytes.length;
+  while(end>0&&(bytes[end-1]===10||bytes[end-1]===13))end--;
+  var variants=[bytes,bytes.subarray(0,end)];
+  for(var v=0;v<variants.length;v++){
+    try{return new TextDecoder("latin1").decode(await inflateBytes(variants[v],"deflate"));}
+    catch(e){}
+  }
+  return null;
+}
+async function pdfText(file){
+  var buf=new Uint8Array(await file.arrayBuffer());
+  /* the decoded string is only used to LOCATE offsets (1 byte = 1 char);
+     actual stream bytes are sliced from buf so binary survives intact */
+  var raw=new TextDecoder("latin1").decode(buf);
+  var tou=await pdfToUnicodeMaps(buf,raw);
+  var hasText=function(t){return /\((?:\\.|[^\\()])*\)\s*T[jJ]/.test(t)||/<[0-9A-Fa-f\s]+>\s*T[jJ]/.test(t)||/\]\s*TJ/.test(t);};
+  var chunks=[],idx=0;
+  while(chunks.length<200){
+    var s=raw.indexOf("stream",idx);if(s<0)break;
+    var ds=s+6;if(raw[ds]==="\r")ds++;if(raw[ds]==="\n")ds++;
+    /* prefer the dict's declared /Length — scanning for "endstream" mis-slices
+       when those bytes coincidentally occur inside compressed data */
+    var e=-1,lm=null,dict=raw.slice(Math.max(0,s-600),s),lre=/\/Length\s+(\d+)\b(?!\s+0\s+R)/g,x;
+    while((x=lre.exec(dict)))lm=x[1];
+    if(lm){
+      var cand=ds+parseInt(lm,10);
+      if(cand<=raw.length&&/^\s*endstream/.test(raw.slice(cand,cand+16)))e=cand;
+    }
+    if(e<0)e=raw.indexOf("endstream",ds);
+    if(e<0)break;
+    var textPart=null,bodyStr=raw.slice(ds,e);
+    if(hasText(bodyStr))textPart=bodyStr;
+    else{
+      var out=await tryInflatePdfStream(buf.subarray(ds,e));
+      if(out&&hasText(out))textPart=out;
+    }
+    if(textPart)chunks.push(pdfOps(textPart,tou));
+    var en=raw.indexOf("endstream",e);
+    idx=en<0?e+1:en+9;
+  }
+  return chunks.join("\n");
+}
+async function extractSyllabusText(file){
+  var name=(file.name||"").toLowerCase();
+  try{
+    if(/\.(txt|md)$/.test(name))return await file.text();
+    if(/\.html?$/.test(name)){
+      var d=document.implementation.createHTMLDocument("");
+      d.documentElement.innerHTML=(await file.text())
+        .replace(/<br\s*\/?>/gi,"\n")
+        .replace(/<\/(p|div|h[1-6]|li|tr|td|th|section|article|header|footer|title)>/gi,"\n");
+      return d.body?d.body.textContent||"":"";
+    }
+    if(/\.docx$/.test(name))return await docxText(file);
+    if(/\.pdf$/.test(name))return await pdfText(file);
+  }catch(e){}
+  return "";
+}
+function parseSyllabusFields(text){
+  var found=[];
+  if(!text||text.length<40)return found;
+  var t=text.replace(/[ \t]/g," ");
+  var lines=t.split(/[\r\n]+/).map(function(l){return l.trim();}).filter(Boolean);
+  if(!S.course){
+    var bad={FALL:1,SPRING:1,SUMMER:1,WINTER:1,CRN:1,ROOM:1,YEAR:1,MWF:1,TR:1,ISBN:1};
+    for(var li=0;li<lines.length;li++){
+      var m=/\b([A-Z]{2,5})\s?-?\s?(\d{3,4}[A-Z]?)\b/.exec(lines[li]);
+      if(m&&!bad[m[1]]){
+        var course=m[1]+" "+m[2];
+        var rest=lines[li].slice(m.index+m[0].length).replace(/^[\s:–—\-·|,]+/,"").trim();
+        rest=rest.replace(/\b(Spring|Summer|Fall|Winter|Maymester)\s*(?:Semester|Term)?,?\s*20\d\d\b/ig,"")
+                 .replace(/\bsyllabus\b/ig,"").replace(/^[\s:–—\-·|,]+|[\s:–—\-·|,]+$/g,"").trim();
+        if(/^[A-Za-z]/.test(rest)&&rest.length>3)course+=" — "+rest.slice(0,60).trim();
+        S.course=course;found.push("course");break;
+      }
+    }
+  }
+  if(!S.term){
+    var tm=/\b(Spring|Summer|Fall|Winter|Maymester)\s*(?:Semester|Term)?,?\s*(20\d\d)\b/i.exec(t);
+    if(tm){S.term=tm[1].charAt(0).toUpperCase()+tm[1].slice(1).toLowerCase()+" "+tm[2];found.push("term");}
+  }
+  if(!S.instructor){
+    var clean=function(v){return v.replace(/\s+/g," ").replace(/\s+([,.])/g,"$1").trim().replace(/[.,;]+$/,"");};
+    var im=/(?:Instructor(?:\s+of\s+Record)?|Professor|Taught\s+by)\s*[:\-–—]\s*([A-Za-zÀ-ÿ.,'’ \-]{3,60})/i.exec(t);
+    if(im){S.instructor=clean(im[1]);found.push("instructor");}
+    else{
+      /* stacked layout: the label on its own line, the name on the next non-empty line */
+      for(var ii=0;ii<lines.length-1;ii++){
+        if(/^(?:Instructor(?:\s+of\s+Record)?|Taught\s+by)\s*:?$/i.test(lines[ii])){
+          for(var jj=ii+1;jj<Math.min(ii+4,lines.length);jj++){
+            var v=lines[jj];
+            if(!v)continue;
+            if(/^[A-ZÀ-Þ]/.test(v)&&/^[A-Za-zÀ-ÿ.,'’ \-]{3,70}$/.test(v)&&v.replace(/\s+/g," ").split(" ").length>=2){
+              S.instructor=clean(v);found.push("instructor");
+            }
+            break;
+          }
+          if(S.instructor)break;
+        }
+      }
+    }
+  }
+  if(!S.crn){
+    var cm=/\bCRN\s*[:#]?\s*(\d{4,6})\b/i.exec(t);
+    if(cm){S.crn=cm[1];found.push("crn");}
+  }
+  return found;
+}
+async function readSyllabus(file){
+  var found=[];
+  try{
+    /* the filename itself is often the cleanest source ("BIOL-4570-Fall-2026-Syllabus.pdf") */
+    var fnameLine=(file.name||"").replace(/\.[^.]+$/,"").replace(/[-_]+/g," ").replace(/\s+/g," ").trim();
+    var body=await extractSyllabusText(file);
+    found=parseSyllabusFields(fnameLine+"\n"+(body||""));
+  }catch(e){}
+  var note=el("sylread");if(!note)return;
+  if(found.length){
+    note.className="hint okc";
+    note.innerHTML="✓ Read from your syllabus: <b>"+esc([S.course,S.term,S.instructor].filter(Boolean).join(" · "))+"</b> — used to label your summary and share card.";
+  }else{
+    note.className="hint";
+    note.textContent="Couldn't read course details from this file — no problem, you can label the share card at the end.";
+  }
+  note.style.display="block";
+}
+function setNone(kind,on){
+  if(kind==="nace")S.naceNone=on;else S.hipsNone=on;
+  renderRail();
+}
+function syncNoneBoxes(){
+  if(el("nace-none"))el("nace-none").checked=S.naceNone;
+  if(el("hips-none"))el("hips-none").checked=S.hipsNone;
+}
+
+/* ================= submit step ================= */
+function renderSubmit(){
+  var b=completeness(),nv=naceEval(),evs=allEvals(),h="";
+  var q=evs.filter(function(e){return e.qualifies;}).length,emg=evs.length-q;
+  h+='<div class="res"><h3>What you&rsquo;re submitting</h3>';
+  h+='<div class="codeline"><span class="cd" style="flex:1"><b>Syllabus</b><small>'+(S.syllabusName?esc(S.syllabusName):"No file attached yet")+'</small></span></div>';
+  h+='<div class="codeline"><span class="cd" style="flex:1"><b>Course</b><small>'+
+    (S.course?esc([S.course,S.term,S.instructor,S.crn].filter(Boolean).join(" · ")):"Details read from the syllabus")+'</small></span></div>';
+  h+='<div class="codeline"><span class="cd" style="flex:1"><b>Career-ready skills</b><small>'+
+    (S.naceNone?"None intentionally built in (confirmed)":nv.length?nv.length+" competenc"+(nv.length>1?"ies":"y")+" tagged":"Nothing entered yet")+'</small></span></div>';
+  h+='<div class="codeline"><span class="cd" style="flex:1"><b>High-Impact Practices</b><small>'+
+    (S.hipsNone?"None in this course (confirmed)":evs.length?q+" meeting the HIP bar"+(emg?", "+emg+" emerging":""):"Nothing entered yet")+'</small></span></div>';
+  h+='</div>';
+  if(b.length){
+    h+='<div class="callout">Almost there — finish these before submitting:<ul class="misslist">'+
+      b.map(function(x){return '<li>'+esc(x.msg)+' <a href="#" onclick="go('+x.step+');return false">Go to step '+x.step+' →</a></li>';}).join("")+
+      '</ul></div>';
+  }else{
+    h+='<div class="callout ok">✓ Everything&rsquo;s in place. Submitting sends your syllabus and this survey to the portal together.</div>';
+  }
+  el("submitbody").innerHTML=h;
+  var btn=el("submitbtn");
+  btn.disabled=b.length>0;
+  btn.style.opacity=b.length?".45":"1";
+  btn.style.cursor=b.length?"not-allowed":"pointer";
+}
+
+/* ================= persistence: URL state ================= */
+function serialize(){
+  var out={c:S.course,t:S.term,i:S.instructor,r:S.crn,nn:S.naceNone?1:0,hn:S.hipsNone?1:0,n:{},h:{}};
+  for(var ci in S.nace){
+    var st=S.nace[ci],arr=[];
+    if(st.skills)for(var ii in st.skills)if(st.skills[ii])arr.push(+ii);
+    if(arr.length||st.depth)out.n[ci]={s:arr,d:st.depth||null};
+  }
+  for(var id in S.hips){
+    var hs=S.hips[id];if(!hs.on)continue;
+    var g=[],e={};
+    if(hs.gates)for(var gi in hs.gates)if(hs.gates[gi])g.push(+gi);
+    if(hs.elems)for(var ei in hs.elems){
+      var arr=[];for(var xi in hs.elems[ei])if(hs.elems[ei][xi])arr.push(+xi);
+      if(arr.length)e[ei]=arr;
+    }
+    out.h[id]={g:g,e:e,m:hs.mode||null,a:hs.abroad||null,w:hs.grade||null};
+  }
+  return btoa(unescape(encodeURIComponent(JSON.stringify(out))));
+}
+function hydrate(){
+  var m=/[?&#]d=([^&]+)/.exec(location.hash||location.search);
+  if(!m)return;
+  try{
+    var o=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));
+    S=blankState();
+    S.course=o.c||"";S.term=o.t||"";S.instructor=o.i||"";S.crn=o.r||"";
+    S.naceNone=!!o.nn;S.hipsNone=!!o.hn;
+    for(var ci in (o.n||{})){
+      S.nace[ci]={open:true,skills:{},depth:o.n[ci].d||null};
+      (o.n[ci].s||[]).forEach(function(ii){S.nace[ci].skills[ii]=true;});
+    }
+    for(var id in (o.h||{})){
+      if(!hipDef(id))continue;
+      S.hips[id]={on:true,gates:{},elems:{},mode:o.h[id].m||null,abroad:o.h[id].a||null,grade:o.h[id].w||null};
+      (o.h[id].g||[]).forEach(function(gi){S.hips[id].gates[gi]=true;});
+      var eo=o.h[id].e||{};
+      for(var ei in eo){
+        S.hips[id].elems[ei]={};
+        (eo[ei]||[]).forEach(function(xi){S.hips[id].elems[ei][xi]=true;});
+      }
+    }
+  }catch(e){}
+}
+function copyLink(){
+  var url=location.href.split("#")[0]+"#d="+encodeURIComponent(serialize());
+  history.replaceState(null,"","#d="+encodeURIComponent(serialize()));
+  var done=function(){snack("Link copied — your answers travel with it.");};
+  if(navigator.clipboard){navigator.clipboard.writeText(url).then(done,function(){fallbackCopy(url);done();});}
+  else{fallbackCopy(url);done();}
+}
+function fallbackCopy(t){var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";
+  document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);}
+
+/* ================= exports ================= */
+function recordJSON(){
+  var fc=finalCodes();
+  return {
+    survey:"gsu-course-tagging-v1",
+    submitted:new Date().toISOString(),
+    course:{title:S.course,term:S.term,instructor:S.instructor,crn:S.crn},
+    syllabusFile:S.syllabusName||null,
+    noCompetencies:S.naceNone,noHips:S.hipsNone,
+    bannerCodes:fc.codes,
+    manualReview:fc.review,
+    nace:naceEval().map(function(n){return {competency:n.name,level:n.tag||"introduced",skills:n.skills};}),
+    hips:allEvals().map(function(e){
+      var st=S.hips[e.def.id],met=[];
+      for(var ei=0;ei<ELEMENTS.length;ei++)if(elemState(st,ei).met)met.push(ELEMENTS[ei].t);
+      var gb=gradeBand(st.grade);
+      return {practice:e.def.name,qualifies:e.qualifies,codes:e.codes,gradeShare:gb?gb.label:null,elementsMet:met,missing:e.missing};
+    })
+  };
+}
+function downloadJSON(){
+  var blob=new Blob([JSON.stringify(recordJSON(),null,2)],{type:"application/json"});
+  var a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=(S.course?S.course.replace(/[^\w\- ]+/g,"").trim().replace(/\s+/g,"-"):"course")+"-tagging.json";
+  document.body.appendChild(a);a.click();document.body.removeChild(a);
+  snack("JSON downloaded.");
+}
+function printSummary(){
+  var fc=finalCodes(),evs=allEvals(),nv=naceEval();
+  var h='<div class="psum">';
+  h+='<h1 class="skew blue">Course Tagging Summary</h1>';
+  h+='<table class="details">';
+  if(S.course)h+='<tr><td><b>Course</b></td><td>'+esc(S.course)+'</td></tr>';
+  if(S.term)h+='<tr><td><b>Term</b></td><td>'+esc(S.term)+'</td></tr>';
+  if(S.instructor)h+='<tr><td><b>Instructor</b></td><td>'+esc(S.instructor)+'</td></tr>';
+  if(S.crn)h+='<tr><td><b>CRN</b></td><td>'+esc(S.crn)+'</td></tr>';
+  h+='</table>';
+  h+='<h2>Banner attribute codes</h2>';
+  h+=fc.codes.length?'<div class="chips">'+fc.codes.map(chipCode).join("")+'</div>':'<p style="font-size:14px">None from this survey.</p>';
+  if(fc.review)h+='<p style="font-size:13px">+ Place-Based Learning — flagged for manual review (no Banner code yet).</p>';
+  var q=evs.filter(function(e){return e.qualifies;});
+  if(q.length){h+='<h2>Qualifying High-Impact Practices</h2><ul>'+q.map(function(e){return '<li>'+esc(e.def.name)+(e.codes.length?' — '+e.codes.join(", "):'')+'</li>';}).join("")+'</ul>';}
+  var emg=evs.filter(function(e){return !e.qualifies;});
+  if(emg.length){h+='<h2>Emerging practices (not tagged)</h2><ul>'+emg.map(function(e){return '<li>'+esc(e.def.name)+' — missing: '+esc(e.missing.join("; "))+'</li>';}).join("")+'</ul>';}
+  if(nv.length){h+='<h2>Career-ready skills (NACE)</h2><ul>'+nv.map(function(n){return '<li><b>'+esc(n.name)+'</b> ('+(n.tag||"introduced only")+'): '+esc(n.skills.join(", "))+'</li>';}).join("")+'</ul>';}
+  h+='<p style="font-size:12px;color:#5a6273;margin-top:22px"><img src="'+FLAME_URI+'" alt="" style="height:26px;vertical-align:middle;margin-right:8px">Georgia State University · Course Tagging Survey</p></div>';
+  el("printArea").innerHTML=h+'<style>@page{size:letter portrait;margin:16mm}</style>';
+  window.print();
+}
+function submitSurvey(){
+  var b=completeness();
+  if(b.length){renderSubmit();snack("A few things to finish first — see the checklist.");return;}
+  /* Wire this to the syllabus-portal backend: POST the syllabus file (el("f-syl").files[0])
+     together with recordJSON(). The survey gates the upload — no record, no upload. */
+  console.log("course-tagging-record",recordJSON());
+  S.submitted=true;
+  go(5);
+  snack("Submitted — your syllabus and survey are in. Thank you!");
+}
+
+/* ================= portal hand-off =================
+   The syllabus portal should link here with the course record appended, e.g.
+   .../Course Tagging Survey.html?course=BIOL%204570%20—%20Field%20Ecology&term=Fall%202026&instructor=J.%20Lonsbury&crn=87215
+   Params are read from the query string or after "?" in the hash, so they
+   compose with saved-answer links (#d=…). Params win over saved-state fields. */
+function getParams(){
+  var out={},srcs=[];
+  if(location.search)srcs.push(location.search.slice(1));
+  var h=location.hash||"",qi=h.indexOf("?");
+  if(qi>=0)srcs.push(h.slice(qi+1));
+  srcs.forEach(function(q){
+    q.split("&").forEach(function(p){
+      if(!p)return;
+      var eq=p.indexOf("=");if(eq<0)return;
+      try{out[decodeURIComponent(p.slice(0,eq))]=decodeURIComponent(p.slice(eq+1).replace(/\+/g,"%20"));}catch(e){}
+    });
+  });
+  return out;
+}
+function hydrateParams(){
+  var P=getParams(),keys=["course","term","instructor","crn"],any=false;
+  for(var i=0;i<keys.length;i++){
+    if(P[keys[i]]){S[keys[i]]=P[keys[i]];any=true;}
+  }
+  if(any&&S.course){
+    var n=el("prefill-note");
+    n.innerHTML="✓ Submitting for <b>"+esc([S.course,S.term].filter(Boolean).join(" · "))+"</b>";
+    n.style.display="block";
+  }
+  return any;
+}
+
+/* ================= boot ================= */
+hydrate();
+hydrateParams();
+go(0);
+</script>
+</body>
+</html>
