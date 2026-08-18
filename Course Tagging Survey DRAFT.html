@@ -413,10 +413,8 @@ var ELEMENTS=[
    "That audience responds — review, Q&A, critique, or feedback"]}
 ];
 var GRADE_BANDS=[
- {k:"lt10",label:"Under 10%",ok:false},
- {k:"10_19",label:"10–19%",ok:false},
- {k:"20_39",label:"20–39%",ok:true},
- {k:"40plus",label:"40% or more",ok:true}
+ {k:"20plus",label:"Yes — 20% or more",ok:true},
+ {k:"lt20",label:"No — less than 20%",ok:false}
 ];
 function gradeBand(k){return GRADE_BANDS.filter(function(b){return b.k===k;})[0]||null;}
 function elemState(st,ei){
@@ -447,74 +445,87 @@ var CODES={
  ZDGP:{d:"Global/Diversity HIP",pending:true}
 };
 
-/* Practices: defining criteria (Part A) distinguish the real HIP from look-alikes. */
+/* Practices: defining criteria (Part A) distinguish the real HIP from look-alikes.
+   desc lines are condensed from "HIPs Descriptions - GSU (Draft)". */
 var HIPS=[
  {id:"collab",name:"Collaborative Assignments & Projects",codes:["ZCOP"],
+  desc:"Students explore ideas or create products by solving problems and working together, building on peers' different backgrounds, perspectives, and life experiences.",
   look:"More than occasional in-class group work:",
   gates:[
    "Students produce a shared, graded deliverable in teams",
    "The same team works together across multiple weeks",
    "Team process is structured — roles, team agreements, or peer evaluation"]},
  {id:"writing",name:"Writing-Intensive",codes:["ZWIP"],
+  desc:"Students produce and revise writing for different purposes and audiences, engaging all stages of the writing process — brainstorming, outlining, drafting, revising.",
   look:"More than a single term paper:",
   gates:[
    "Students complete multiple writing assignments across the term",
    "At least one assignment is revised after instructor or peer feedback",
    "Writing is a major share of the course grade"]},
  {id:"global",name:"Diversity / Global Learning",codes:[],branch:true,
+  desc:"Develops intercultural competence and a sense of global responsibility: students critically explore real-world issues and engage different cultures, life experiences, and worldviews — enriched by virtual exchange, domestic field courses, or study abroad.",
   look:"More than a diverse reading list:",
   gates:[
    "Engaging with difference (cultural, global, or lived experience) is a stated course outcome",
    "Students interact directly with people, communities, or materials representing perspectives different from their own",
    "Structured reflection asks students to examine their own perspectives"]},
  {id:"eport",name:"ePortfolios",codes:["ZEPP"],
+  desc:"Students curate learning artifacts and reflections on a digital platform — demonstrating growth, connecting experiences, and showcasing work to potential employers.",
   look:"More than a folder of submitted files:",
   gates:[
    "Students curate a portfolio of their work over the term (or program)",
    "Students write reflections connecting portfolio artifacts to their learning",
    "The portfolio is graded or shared with a real audience"]},
  {id:"place",name:"Place-Based Learning",codes:[],review:true,
+  desc:"Deliberately uses the history, culture, or physical environment of a specific locale as the context for teaching and learning — on location, or as a framework for classroom learning.",
   look:"More than a field-trip day:",
   gates:[
    "Learning is anchored in a specific place or community (e.g., Atlanta as classroom, field sites)",
    "Students spend structured time in that place — not only reading about it",
    "Graded assignments connect the place to course concepts"]},
  {id:"ugr",name:"Undergraduate Research",codes:["ZURP"],
+  desc:"Discovery and active exploration of contested questions through systematic investigation — empirical observation, analytical methods, and discipline-specific approaches, ideally from inception to dissemination.",
   look:"More than reading published studies:",
   gates:[
    "Students pursue an actual question using the field's methods and evidence",
    "Students are mentored through the research process across the term",
    "Students communicate findings (paper, poster, or presentation)"]},
- {id:"intern",name:"Internships / Field Experiences",codes:["ZWLP"],
+ {id:"intern",name:"Internships / Field Experiences / Work-Based Learning",codes:["ZWLP"],
+  desc:"Professional experience through an academic lens: hands-on work in a real-world setting, aligned to career goals, with mentorship from a professional and faculty-reviewed academic work.",
   look:"More than a site visit or shadowing day:",
   gates:[
    "Students spend substantial hours in an authentic work setting",
    "A site supervisor or mentor provides ongoing feedback",
    "Graded academic work connects the experience to course learning outcomes"]},
  {id:"service",name:"Service- / Community-Based Learning",codes:["ZSLP"],
+  desc:"Field-based experiential learning through service with community partners — students connect classroom concepts to real community needs and reflect on the experience.",
   look:"More than extra-credit volunteering:",
   gates:[
    "Service responds to a need identified with a community partner",
    "Service is a required, integrated part of the course — not an add-on",
    "Structured reflection connects the service to course learning outcomes"]},
  {id:"capstone",name:"Capstone Courses & Projects",codes:["ZCAP"],
+  desc:"A culminating experience near the end of a program where students integrate and apply their learning in a final project — a performance, exhibition, paper, prototype, portfolio, or launched program.",
   look:"More than a big final assignment:",
   gates:[
    "The project requires students to integrate and apply learning from across their program",
    "Students produce a substantial culminating product (thesis, exhibit, performance, portfolio)",
    "Students present, defend, or publicly share the work"]},
  {id:"cie",name:"Common Intellectual Experiences",codes:["ZCIP"],
+  desc:"Courses completed by all students in a program or general-education sequence, often linked to co-curricular events around a shared issue, common book, or broad interdisciplinary theme.",
   look:"More than a shared textbook:",
   gates:[
    "The course is part of a required common curriculum or a broadly shared intellectual theme",
    "The theme is integrated across courses and/or co-curricular programming"]},
  {id:"fye",name:"First-Year Seminars & Experiences",codes:["ZFYP"],
+  desc:"Brings small groups of students together with faculty early in the curriculum to foster community and belonging, with emphasis on critical inquiry, information literacy, writing, reflection, and collaboration.",
   look:"More than an orientation session:",
   gates:[
    "The course is designed for first-year students",
    "Students meet regularly with faculty or staff in a small-group setting",
    "Critical inquiry, writing, information literacy, or collaboration are core, practiced activities"]},
  {id:"lc",name:"Learning Communities",codes:["ZLCP"],
+  desc:"A cohort of students co-enrolled in linked courses where learning integrates across them — exploring common topics and big questions through different disciplinary lenses.",
   look:"More than shared advisement:",
   gates:[
    "The same cohort of students is co-enrolled in two or more linked courses",
@@ -588,8 +599,8 @@ function hipEval(id){
   var e38=false;for(var ei=2;ei<8;ei++)if(elemState(st,ei).met)e38=true;
   if(!e38)missing.push("At least one of elements 3–8 fully in place (substantive interaction, feedback, reflection, real-world application, …)");
   var gb=gradeBand(st.grade);
-  if(!gb)missing.push("Grade weight: tell us the share of the overall grade tied to this practice");
-  else if(!gb.ok)missing.push("GSU requirement: work tied to this practice must count for at least 20% of the overall course grade (currently "+gb.label.toLowerCase()+")");
+  if(!gb)missing.push("Grade weight: tell us whether at least 20% of the grade is tied to this practice");
+  else if(!gb.ok)missing.push("GSU requirement: a HIP must carry at least 20% of the overall course grade — below that, this practice can't be tagged as a HIP");
   var needMode=def.branch&&!st.mode;
   var needAbroad=def.branch&&st.mode==="abroad"&&!st.abroad;
   if(needMode)missing.push("Choose how students engage globally (modality)");
@@ -696,7 +707,7 @@ function renderScreener(){
   var h="";
   for(var i=0;i<HIPS.length;i++){
     var on=S.hips[HIPS[i].id]&&S.hips[HIPS[i].id].on;
-    h+='<button type="button" class="'+(on?"on":"")+'" onclick="hpToggle(\''+HIPS[i].id+'\')">'+esc(HIPS[i].name)+'</button>';
+    h+='<button type="button" class="'+(on?"on":"")+'" title="'+esc(HIPS[i].desc||"")+'" onclick="hpToggle(\''+HIPS[i].id+'\')">'+esc(HIPS[i].name)+'</button>';
   }
   el("hip-screener").innerHTML=h;
 }
@@ -716,6 +727,7 @@ function renderPanels(){
       '<div class="vhead"><span class="skewname skew blue">'+esc(def.name)+'</span>'+
       '<span class="vstatus '+(ev.qualifies?"ok":"no")+'">'+(ev.qualifies?(def.review?"✓ HIP — manual review":"✓ Meets HIP criteria"):"Not yet at HIP level")+'</span></div>'+
       '<div class="vbody">';
+    if(def.desc)h+='<p class="pdesc" style="margin:8px 0 0">'+esc(def.desc)+'</p>';
     /* Part A : defining criteria */
     h+='<div class="vpart"><p class="pt"><b>Part A</b> · Is it the practice?</p>'+
       '<p class="pdesc">'+esc(def.look)+' check each statement that is true for this course.</p>';
@@ -725,11 +737,16 @@ function renderPanels(){
     }
     h+='</div>';
     /* GSU grade-weight requirement */
-    h+='<div class="depth" style="margin:12px 2px 0"><span class="q">About how much of the overall course grade is tied to this practice?</span>';
+    h+='<div class="depth" style="margin:12px 2px 0"><span class="q">Is at least 20% of the overall course grade tied to this practice?</span>';
     for(var bi=0;bi<GRADE_BANDS.length;bi++){
       h+='<button type="button" class="'+(st.grade===GRADE_BANDS[bi].k?"on":"")+'" onclick="hpGrade(\''+def.id+'\',\''+GRADE_BANDS[bi].k+'\')">'+GRADE_BANDS[bi].label+'</button>';
     }
-    h+='<span class="dhint">GSU requires a HIP to carry at least 20% of the overall course grade.</span></div>';
+    if(st.grade==="lt20"){
+      h+='<span class="dhint" style="color:var(--crimson);font-weight:600">Below 20%, this can&rsquo;t be counted as a HIP — that&rsquo;s the GSU threshold. Everything else you enter here is still saved.</span>';
+    }else{
+      h+='<span class="dhint">GSU requires that a HIP carry at least 20% of the overall course grade.</span>';
+    }
+    h+='</div>';
     /* branch for global learning */
     if(def.branch){
       h+='<div class="branch"><p class="q">How do students engage globally in this course?</p>';
@@ -981,8 +998,8 @@ function buildCard(fmt){
       ctx.fillStyle="#c8102e";
       ctx.fillRect(x,yy-2,6,24);
       ctx.fillStyle="#1b1f2a";ctx.font="700 22px "+FONT;
-      ctx.fillText(p.name,x+18,yy+16);
-      yy+=28;
+      var nls=wrapLines(ctx,p.name,w-18);
+      for(var ni=0;ni<nls.length;ni++){ctx.fillText(nls[ni],x+18,yy+16);yy+=28;}
       ctx.fillStyle="#3a4150";ctx.font="500 19px "+FONT;
       var ls=wrapLines(ctx,p.why,w-18);
       for(var li=0;li<ls.length;li++){ctx.fillText(ls[li],x+18,yy+14);yy+=25;}
@@ -1428,7 +1445,11 @@ function hydrate(){
     }
     for(var id in (o.h||{})){
       if(!hipDef(id))continue;
-      S.hips[id]={on:true,gates:{},elems:{},mode:o.h[id].m||null,abroad:o.h[id].a||null,grade:o.h[id].w||null};
+      var w=o.h[id].w||null;
+      /* migrate pre-simplification band keys from older saved links */
+      if(w==="lt10"||w==="10_19")w="lt20";
+      else if(w==="20_39"||w==="40plus")w="20plus";
+      S.hips[id]={on:true,gates:{},elems:{},mode:o.h[id].m||null,abroad:o.h[id].a||null,grade:w};
       (o.h[id].g||[]).forEach(function(gi){S.hips[id].gates[gi]=true;});
       var eo=o.h[id].e||{};
       for(var ei in eo){
