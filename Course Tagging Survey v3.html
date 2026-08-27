@@ -95,11 +95,15 @@
 
   /* v3: share-of-grade slider */
   .gslider{margin:10px 2px 2px;padding:12px 16px;background:var(--soft);border-radius:8px;max-width:560px}
-  .gslider .gsrow{display:flex;align-items:center;gap:14px}
-  .gslider input[type=range]{flex:1;accent-color:var(--blue);height:22px;margin:0;cursor:pointer}
+  .gslider .gsrow{display:flex;align-items:flex-start;gap:14px}
+  .gslider .gscol{flex:1;min-width:0}
+  .gslider input[type=range]{display:block;width:100%;accent-color:var(--blue);height:22px;margin:0;cursor:pointer}
   .gslider .gsval{font-size:15.5px;font-weight:700;color:var(--blue);min-width:46px;text-align:right}
   .gslider .gsval.unset{color:var(--muted);font-weight:600}
-  .gslider .gsticks{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin:2px 0 0;padding-right:60px}
+  /* each label is absolutely centered under its stop; the calc() offsets
+     compensate for the ~16px thumb, whose center travels 8px → 100%−8px */
+  .gslider .gsticks{position:relative;height:15px;font-size:11px;color:var(--muted);margin:3px 0 0}
+  .gslider .gsticks span{position:absolute;top:0;transform:translateX(-50%);white-space:nowrap}
   .gslider .dhint{display:block;font-size:11.5px;color:var(--muted);margin-top:8px;min-height:1em}
 
   /* elements grid (HIPs step, section 2) */
@@ -265,7 +269,7 @@
           <span class="farrow" aria-hidden="true">→</span>
           <div class="fnode"><span class="fn">2</span><b>Career-ready skills</b><small>Check the competencies your course builds</small></div>
           <span class="farrow" aria-hidden="true">→</span>
-          <div class="fnode"><span class="fn">3</span><b>High-Impact Practices</b><small>Select any practices and their elements</small></div>
+          <div class="fnode"><span class="fn">3</span><b>High-Impact Practices</b><small>Select any relevant practices and their elements</small></div>
           <span class="farrow" aria-hidden="true">→</span>
           <div class="fnode"><span class="fn">4</span><b>Submit</b><small>Syllabus and survey go to the portal together</small></div>
           <span class="farrow" aria-hidden="true">→</span>
@@ -308,6 +312,10 @@
       <!-- STEP 3 : HIPs -->
       <section class="view" id="view-3">
         <h2 class="sec">High-Impact Practices (HIPs)</h2>
+        <p class="secsub" style="max-width:none">High-Impact Practices (HIPs) are teaching and learning practices that, based on research
+          evidence, &ldquo;show significant educational benefits for students who participate in them&mdash;including and
+          especially those from demographic groups historically underserved by higher education&rdquo;
+          (<a href="https://www.aacu.org/trending-topics/high-impact" target="_blank" rel="noopener">AAC&amp;U</a>).</p>
         <p class="secsub" style="max-width:none">This step is three short questions: <b>1</b> — which high-impact practices (HIPs) are embedded
           in this course, <b>2</b> — which elements of high-impact learning are emphasized, and <b>3</b> — how much of
           the course grade is linked to the selected HIPs and elements. Questions 2 and 3 appear after you select a
@@ -421,36 +429,43 @@ var COMPS=[
 var ELEMENTS=[
  {t:"Performance expectations set at appropriately high levels",s:"high expectations",req:true,inds:[
    "Rubrics or TILT-style assignment guides spell out purpose, tasks, and grading criteria",
-   "Students see concrete examples of what high-quality work looks like",
-   "Standards are held — top marks require more than completion, with support available to reach them"]},
+   "Students are challenged and supported to produce high-quality work",
+   "Standards are held — top marks require more than completion"]},
  {t:"Significant investment of time and effort by students over an extended period of time",s:"time & effort over time",req:true,inds:[
    "The experience runs across a significant stretch of the term — not a single week or unit",
-   "Work is scaffolded into smaller, sequential tasks with milestones that keep students engaged regularly",
-   "It demands substantial student work outside of class time"]},
+   "Work is scaffolded into smaller, sequential tasks with milestones that keep students engaged",
+   "Effort required of students is sustained and substantial across multiple course activities"]},
  {t:"Interaction with faculty and peers about substantive matters",s:"substantive interaction",req:false,inds:[
-   "Students interact with the instructor regularly about the substance of their work (feedback sessions, conferences, RSI-style interaction) — beyond logistics",
-   "Structured activities have students engage each other's ideas and work (peer feedback sessions, teams, seminar discussion)"]},
+   "Students regularly participate in discussion of complex topics with their instructor and peers",
+   "Structured activities have students problem-solve and collaborate as a community of learners",
+   "Involving students in course design, collective decision-making, and feedback sessions"]},
  {t:"Experiences with diversity",s:"diversity of viewpoints",req:false,inds:[
-   "Students engage diverse viewpoints, worldviews, or frameworks — disciplinary schools of thought and/or perspectives different from their own",
-   "Students analyze and discuss those differing histories, values, and arguments — the encounter isn't left unexamined"]},
+   "Exposure to diverse viewpoints, worldviews, or frameworks — disciplinary schools of thought and/or perspectives and experiences different from their own",
+   "Active listening and open discussion of differing histories, values, and arguments",
+   "Critical examination and reflection of dominant narratives, assumptions, and biases"]},
  {t:"Frequent, timely, and constructive feedback",s:"frequent feedback",req:false,inds:[
-   "Students get feedback at multiple points along the way — not only a final grade",
-   "Feedback arrives in time for students to use it in the next stage or a revision",
-   "Feedback is instructive, not just evaluative — it explains what to improve and why"]},
+   "Feedback is part of the learning and revision process — not just evaluative on a product or final grade",
+   "Instructor and/or peer feedback is given at multiple points along the way to help in next steps",
+   "Feedback is instructive and in time to make changes — it explains how to improve and why"]},
  {t:"Periodic, structured opportunities to reflect and integrate learning",s:"structured reflection",req:false,inds:[
    "Structured prompts (journals, logs, discussions) have students reflect before, during, and after key experiences — not just once at the end",
-   "Prompts ask students to connect the experience to course goals, other courses, and real-world situations"]},
+   "Reflections are linked to learning and can reinforce or promote deeper understanding of course concepts",
+   "Prompts ask students to make connections to course goals, other courses, real-world situations, or what is meaningful to them"]},
  {t:"Opportunities to discover relevance of learning through real-world applications",s:"real-world application",req:false,inds:[
    "Students apply their learning to unscripted, real problems — answers aren't in the back of the book",
-   "The context is authentic: a community partner, client, field site, public audience, or real data"]},
+   "The related context is authentic: a community partner, client, field site, public audience, or real data",
+   "Students recognize relevance in their work and how to make contributions beyond the class setting"]},
  {t:"Public demonstration of competence",s:"public demonstration",req:false,inds:[
-   "Students share finished work with an audience beyond the instructor — peers, professionals, employers, or the community",
-   "That audience responds — review, Q&A, critique, or feedback"]}
+   "Students share finished work with an audience — peers, professionals, employers, guests, communities, etc.",
+   "Engaging with external audiences can elevate the impact and encourage broader perspectives of the work",
+   "Examples could include portfolios, presentations, posters, podcasts, exhibits, online publications, and more"]}
 ];
-/* v3: share of grade is a 6-stop slider. gradeBand keeps its old name and
-   {label, ok} shape so the ≥20% qualification rule and call sites hold. */
+/* v3: share of grade is a slider — labeled ticks every 20%, unlabeled stops
+   every 5% in between. gradeBand keeps its old name and {label, ok} shape so
+   the ≥20% qualification rule and call sites hold. GRADE_STEPS is now just
+   the labeled ticks; any multiple of 5 from 0–100 is a valid answer. */
 var GRADE_STEPS=[0,20,40,60,80,100];
-function gradeBand(v){return GRADE_STEPS.indexOf(v)>=0?{k:v,label:v+"%",ok:v>=20}:null;}
+function gradeBand(v){return typeof v==="number"&&v>=0&&v<=100&&v%5===0?{k:v,label:v+"%",ok:v>=20}:null;}
 
 /* Banner attribute codes — from OII/IE data report (C. Visaggi, Jan 2026) */
 var CODES={
@@ -567,7 +582,7 @@ function blankState(){return {course:"",term:"",instructor:"",crn:"",
   nace:{},   /* ci -> true */
   hips:{},   /* id -> true */
   elems:{},  /* ei -> true — shared across the selected practices */
-  grade:null,/* share-of-grade percent (a GRADE_STEPS value) or null */
+  grade:null,/* share-of-grade percent (a multiple of 5, 0–100) or null */
   mode:null, /* Diversity/Global Learning modality */
   abroad:null
 };}
@@ -754,16 +769,19 @@ function renderFollowup(){
   renderGrade();
 }
 function renderGrade(){
-  /* section 3: share of the overall grade — a 6-stop slider. hpGrade updates
-     the readout and warning surgically so an in-progress drag isn't re-rendered
-     out from under the pointer. */
+  /* section 3: share of the overall grade — labeled ticks every 20%, unlabeled
+     stops every 5%. hpGrade updates the readout and warning surgically so an
+     in-progress drag isn't re-rendered out from under the pointer. */
   var gb=gradeBand(S.grade);
   var g='<div class="gsrow">'+
-    '<input type="range" id="gradeslider" min="0" max="100" step="20" value="'+(gb?S.grade:0)+'"'+
-    ' aria-label="Share of the overall course grade, in steps of 20 percent"'+
+    '<div class="gscol">'+
+    '<input type="range" id="gradeslider" min="0" max="100" step="5" value="'+(gb?S.grade:0)+'"'+
+    ' aria-label="Share of the overall course grade, in steps of 5 percent"'+
     ' onpointerdown="hpGrade(+this.value)" oninput="hpGrade(+this.value)" onkeyup="hpGrade(+this.value)">'+
+    '<div class="gsticks" aria-hidden="true">'+GRADE_STEPS.map(function(v){
+      return '<span style="left:calc('+v+'% + '+(8-0.16*v)+'px)">'+v+'%</span>';}).join("")+'</div>'+
+    '</div>'+
     '<output class="gsval'+(gb?'':' unset')+'" id="gradeout" for="gradeslider" role="status">'+(gb?esc(gb.label):"—")+'</output></div>'+
-    '<div class="gsticks" aria-hidden="true">'+GRADE_STEPS.map(function(v){return '<span>'+v+'%</span>';}).join("")+'</div>'+
     '<span class="dhint" id="gradewarn"></span>';
   el("hip-grade").innerHTML=g;
   gradeWarn();
@@ -788,7 +806,7 @@ function hpElem(ei,on){
   if(lab)lab.classList.toggle("on",on);
 }
 function hpGrade(v){
-  if(GRADE_STEPS.indexOf(v)<0)return;
+  if(!gradeBand(v))return;
   S.grade=v;
   var out=el("gradeout");
   if(out){out.textContent=v+"%";out.classList.remove("unset");}
