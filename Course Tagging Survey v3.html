@@ -436,7 +436,7 @@ var ELEMENTS=[
    "Rubrics or TILT-style assignment guides spell out purpose, tasks, and grading criteria",
    "Students are challenged and supported to produce high-quality work",
    "Standards are held — top marks require more than completion"]},
- {t:"Significant investment of time and effort by students over an extended period of time",s:"time & effort over time",req:true,inds:[
+ {t:"Significant investment of time and effort by students over an extended period of time",s:"significant time and effort",req:true,inds:[
    "The experience runs across a significant stretch of the term — not a single week or unit",
    "Work is scaffolded into smaller, sequential tasks with milestones that keep students engaged",
    "Effort required of students is sustained and substantial across multiple course activities"]},
@@ -444,7 +444,7 @@ var ELEMENTS=[
    "Students regularly participate in discussion of complex topics with their instructor and peers",
    "Structured activities have students problem-solve and collaborate as a community of learners",
    "Involving students in course design, collective decision-making, and feedback sessions"]},
- {t:"Experiences with diversity",s:"diversity of viewpoints",req:false,inds:[
+ {t:"Experiences with diversity",s:"diversity of experiences",req:false,inds:[
    "Exposure to diverse viewpoints, worldviews, or frameworks — disciplinary schools of thought and/or perspectives and experiences different from their own",
    "Active listening and open discussion of differing histories, values, and arguments",
    "Critical examination and reflection of dominant narratives, assumptions, and biases"]},
@@ -514,13 +514,13 @@ var HIPS=[
  {id:"writing",name:"Writing-Intensive Courses",codes:["ZWIP"],group:"course",
   desc:"facilitate opportunities for students to produce and revise writing for different purposes across all disciplines. Students may be guided to analyze course material, explain reasoning, demonstrate understanding, or communicate to different audiences through writing. Engaging learners in all stages of the writing process (e.g., brainstorming, outlining, drafting, revising) is encouraged."},
  {id:"global",name:"Diversity/Global Learning",codes:[],branch:true,group:"course",
-  desc:"fosters the development of intercultural competence and a sense of global responsibility. Students have opportunities to critically explore real-world issues and/or interact with others who represent different cultures, life experiences, and worldviews. Themes might focus on variations in social or cultural norms and values, either globally or within the U.S., and examine issues that relate to power, inequalities, systems, and human rights. Course approaches are particularly enriched by experiential learning including virtual exchange, domestic field courses, or study abroad."},
+  desc:"fosters the development of intercultural competence and global perspectives. Students might engage in comparative approaches on a subject; interact with others who have different worldviews, cultures, and life experiences; and/or critically examine real-world issues related to power, inequalities, and human rights. Social, economic, environmental, political, and cultural differences in norms, values, and systems, globally or within the U.S., might be examined. Course approaches are enhanced by experiential learning such as virtual exchange, domestic field courses, or study abroad."},
  {id:"place",name:"Place-Based Learning",codes:[],review:true,group:"course",
-  desc:"is an educational approach that deliberately uses the history, culture, or physical environment of a specific locale as the context for teaching and learning. Opportunities to link learning to familiar or meaningful places can be particularly beneficial. Students may engage in an experiential component that is done on location but studying and connecting to place can also serve as a framework for classroom learning."},
+  desc:"is an educational approach that deliberately uses the history, culture, or physical environment of a specific locale as the context for teaching and learning. Opportunities to link learning to familiar or meaningful places can be particularly beneficial. Students may be guided to engage in immersive learning on location, but studying and connecting to place can also serve as a framework for classroom learning."},
  {id:"eport",name:"ePortfolios",codes:["ZEPP"],group:"course",
-  desc:"are collections of learning artifacts and accompanying reflections curated by students on a digital platform. Students feature products created during their educational journey and relevant co-curricular and life experiences that demonstrate personal and academic growth. ePortfolios can serve as measures of competence in a program of study, help students make connections across learning experiences, and showcase products to potential employers."},
+  desc:"are collections of learning artifacts and accompanying reflections curated by students on a digital platform. Students feature products created during their educational journey and relevant co-curricular and life experiences that demonstrate personal and academic growth. They can serve as measures of competence in a program of study, help students make connections across experiences, and showcase products to employers."},
  {id:"ugr",name:"Undergraduate Research",codes:["ZURP"],group:"course",
-  desc:"encourages discovery and the active exploration of concepts and contested questions through systematic investigation. Learners are guided in scholarly work that involves empirical observation, analytical methods, and cutting-edge technologies through discipline-specific approaches. Students engage in iterative processes to produce results and work toward intellectual or creative contributions that have meaning beyond the classroom. Providing opportunities for participation in all aspects of the research process from inception to dissemination is optimal."},
+  desc:"encourages discovery and the active exploration of concepts and contested questions through systematic investigation. Learners are guided in scholarly work that involves empirical observation, analytical methods, innovative interpretation, and/or cutting-edge technologies through discipline-specific approaches. Students engage in iterative processes to produce results and work toward intellectual or creative contributions that have meaning beyond the classroom. Facilitating participation in all aspects of the research process from inception to dissemination is optimal."},
  {id:"intern",name:"Internships/Work-Based Learning",codes:["ZWLP"],group:"spec",
   desc:"provide opportunities for students to engage in professional experiences through an academic lens. Students apply existing knowledge, develop new skills, and strengthen career competencies by gaining practical “hands-on” experience in a real-world setting. Typically, such experiences are aligned to career goals, involve mentorship or supervision of a professional beyond the classroom, and include activities or projects reviewed by a faculty member."},
  {id:"service",name:"Service-Learning/Community-Based Learning",codes:["ZSLP"],group:"spec",
@@ -790,10 +790,10 @@ function renderGrade(){
     '<span class="dhint" id="gradewarn"></span>'+
     /* worked example of the calculation, per reviewer feedback (Aug 2026) */
     '<details class="gex"><summary>See an example of how this percentage is calculated</summary><ul>'+
-    '<li><b>HIPs approaches</b> in the course include place-based learning and ePortfolios.</li>'+
-    '<li><b>Elements</b> include high expectations, significant time and effort, reflection, and public demonstration.</li>'+
-    '<li><b>Assessments</b> include multiple-choice exams (50%), online homework quizzes (20%), <b>a reflection journal (10%)</b>, and <b>a final ePortfolio (20%)</b> &mdash; the two in bold are where the HIPs and elements are incorporated.</li>'+
-    '<li><b>Total:</b> 10% + 20% = <b>30%</b> of the overall grade is linked to HIPs and elements, so the slider is set to 30%.</li>'+
+    '<li><b>HIPs</b> approaches in the course include place-based learning and ePortfolios.</li>'+
+    '<li><b>Elements</b> include high expectations, significant time and effort, structured reflection, and public demonstration.</li>'+
+    '<li><b>Assessments</b> include multiple-choice exams (50%), online homework quizzes (20%), <b>a reflection journal (15%)</b>, and <b>a final ePortfolio (15%)</b> &mdash; the two in bold are where the HIPs and elements are incorporated.</li>'+
+    '<li><b>Total:</b> 15% + 15% = <b>30%</b> of the overall grade is linked to HIPs and elements, so the slider is set to 30%.</li>'+
     '</ul></details>';
   el("hip-grade").innerHTML=g;
   gradeWarn();
