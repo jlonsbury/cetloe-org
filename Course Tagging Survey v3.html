@@ -8,7 +8,7 @@
   :root{
     --blue:#003986; --navy:#00205b; --crimson:#c8102e;
     --ink:#1b1f2a; --muted:#5a6273; --line:#e3e7ee; --soft:#f5f7fb;
-    --ok:#0d7a6f; --oksoft:#e4f4f1; --warn:#9a6700; --warnsoft:#fbf1da;
+    --ok:#0d7a6f; --oksoft:#e4f4f1; --warn:#8a5c00; --warnsoft:#fbf1da; /* warn ≥4.5:1 on warnsoft (AA) */
   }
   *{box-sizing:border-box}
   body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
@@ -186,7 +186,9 @@
   }
   @media(max-width:680px){
     h1.page{font-size:23px}
-    .stepper button .lbl{display:none}
+    /* visually hidden, not display:none — the label is the button's accessible name */
+    .stepper button .lbl{position:absolute;width:1px;height:1px;margin:-1px;padding:0;
+      overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap;border:0}
   }
 
   /* ===== v2: competency cards (one checkbox per competency) ===== */
@@ -270,7 +272,7 @@
         <p class="lead">Your syllabus is submitted together with a short survey about your course.
           Here&rsquo;s the whole process:</p>
         <div class="flow" role="img" aria-label="Process: attach your syllabus, check the career-ready skills your course builds, select its High-Impact Practices, submit everything together, then review your tags and copy a summary for your annual evaluation and iCollege.">
-          <div class="fnode"><span class="fn">1</span><b>Attach your syllabus</b><small>Nothing is submitted yet</small></div>
+          <div class="fnode"><span class="fn">1</span><b>Attach your public syllabus</b></div>
           <span class="farrow" aria-hidden="true">→</span>
           <div class="fnode"><span class="fn">2</span><b>Career-ready skills</b><small>Check the competencies your course builds</small></div>
           <span class="farrow" aria-hidden="true">→</span>
@@ -280,7 +282,7 @@
           <span class="farrow" aria-hidden="true">→</span>
           <div class="fnode"><span class="fn">5</span><b>Review</b><small>See what was tagged; copy a summary for your annual evaluation and iCollege</small></div>
         </div>
-        <p class="hint" style="margin-top:14px">A link to the syllabus you submit will be added to your corresponding iCollege course(s).</p>
+        <p class="hint" style="margin-top:14px">Once all steps are completed, a link to the syllabus you submit will be added to your corresponding iCollege course(s).</p>
         <div class="navrow" style="margin-top:24px"><button class="btn" style="padding:12px 34px;font-size:15.5px" onclick="go(1)">Begin →</button></div>
       </section>
 
@@ -295,8 +297,7 @@
           <input type="file" id="f-syl" hidden accept=".pdf,.doc,.docx,.html,.htm" onchange="sylFile(this)">
         </div>
         <p class="hint okc" id="sylread" role="status" style="display:none;margin-top:10px"></p>
-        <p class="hint" style="margin-top:10px">Attaching doesn&rsquo;t submit anything — your syllabus goes to the portal after the survey, when you hit Submit at step 4.</p>
-        <p class="hint" style="margin-top:6px">A link to the syllabus you submit will be added to your corresponding iCollege course(s).</p>
+        <p class="hint" style="margin-top:6px">Once all steps are completed, a link to the syllabus you submit will be added to your corresponding iCollege course(s).</p>
         <div class="navrow"><button class="btn text" onclick="go(0)">← Overview</button><span class="spacer"></span><button class="btn" onclick="go(2)">Continue →</button></div>
       </section>
 
@@ -392,8 +393,10 @@
 <script>
 /* ================= data ================= */
 var ICON_BASE="https://cdn.gsu.edu/apps-assets/career-prep/";
-/* official flame mark, read from the inlined header image */
-var FLAME_URI=document.querySelector("header img.flame").src;
+/* official flame mark, read from the inlined header image (guarded — a missing
+   header image must not take the whole script down with it) */
+var _flameEl=document.querySelector("header img.flame");
+var FLAME_URI=_flameEl?_flameEl.src:"";
 
 var COMPS=[
 /* NACE career-readiness competencies — definitions from naceweb.org
@@ -584,6 +587,7 @@ var ABROAD_TYPES=[
 /* ================= state ================= */
 function blankState(){return {course:"",term:"",instructor:"",crn:"",
   syllabusName:"",naceNone:false,hipsNone:false,submitted:false,
+  submittedAt:null, /* ISO time of the actual submit — recordJSON must not restamp on later exports */
   nace:{},   /* ci -> true */
   hips:{},   /* id -> true */
   elems:{},  /* ei -> true — shared across the selected practices */
@@ -595,7 +599,16 @@ var S=blankState();
 var step=1, visited={1:true};
 
 function el(id){return document.getElementById(id);}
-function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");}
+/* any answer edit after a submit invalidates it — step 5 and the exports must
+   never present revised answers as the submitted record (course-label edits on
+   the summary are cosmetic and deliberately exempt) */
+function answersChanged(){
+  if(S.submitted){
+    S.submitted=false;S.submittedAt=null;
+    snack("You’ve changed your answers since submitting — hit Submit at step 4 to update your record.");
+  }
+}
+function esc(s){return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");}
 function snack(m){var t=el("snackbar");t.textContent=m;t.classList.add("show");clearTimeout(t._t);t._t=setTimeout(function(){t.classList.remove("show");},2400);}
 
 /* ================= evaluation ================= */
@@ -615,10 +628,10 @@ function hipMissing(){
   var e38=false;for(var ei=2;ei<8;ei++)if(S.elems[ei])e38=true;
   if(!e38)missing.push("At least one of elements 3–8 (substantive interaction, diversity, feedback, reflection, real-world application, or public demonstration)");
   var gb=gradeBand(S.grade);
-  if(!gb)missing.push("Grade share: tell us how much of the course grade is based on the selected HIPs and elements");
+  if(!gb)missing.push("Share of the course grade based on the selected HIPs and elements — not answered yet");
   else if(!gb.ok)missing.push("GSU requirement: at least 20% of the course grade must be connected to the selected HIPs and elements — below that, this course can't be tagged as a HIP");
-  if(S.hips.global&&!S.mode)missing.push("Diversity/Global Learning: choose how students engage globally (modality)");
-  if(S.hips.global&&S.mode==="abroad"&&!S.abroad)missing.push("Diversity/Global Learning: choose the study-abroad program type");
+  if(S.hips.global&&!S.mode)missing.push("Diversity/Global Learning: how students engage globally isn't chosen yet");
+  if(S.hips.global&&S.mode==="abroad"&&!S.abroad)missing.push("Diversity/Global Learning: the study-abroad program type isn't chosen yet");
   return missing;
 }
 function hipsQualify(){return selectedHips().length>0&&hipMissing().length===0;}
@@ -666,6 +679,7 @@ function renderNace(){
   el("nace-boxes").innerHTML=h;
 }
 function ncToggle(ci,on){
+  answersChanged();
   S.nace[ci]=on;
   if(on){S.naceNone=false;syncNoneBoxes();}
   /* class toggle only — a full re-render would destroy keyboard focus */
@@ -714,6 +728,7 @@ function renderHips(){
   renderFollowup();
 }
 function hpToggle(id,on){
+  answersChanged();
   S.hips[id]=on;
   if(on){S.hipsNone=false;syncNoneBoxes();}
   /* class toggle only — a full re-render would destroy keyboard focus */
@@ -729,11 +744,13 @@ function hpToggle(id,on){
   if(on&&selectedHips().length===1)snack("Questions 2 and 3 are now open below the practice list.");
 }
 function hpMode(k){
+  answersChanged();
   S.mode=k;if(k!=="abroad")S.abroad=null;
   var br=el("gbranch");
   if(br){br.outerHTML=globalBranch();var r=el("gmode-"+k);if(r)r.focus();}
 }
 function hpAbroad(k){
+  answersChanged();
   S.abroad=k;
   var br=el("gbranch");
   if(br){br.outerHTML=globalBranch();var r=el("gabroad-"+k);if(r)r.focus();}
@@ -756,6 +773,12 @@ function renderFollowup(){
     }
   }
   if(!any)return;
+  /* remember which "What implementation can look like" expanders are open —
+     re-rendering on every HIP toggle would otherwise snap them shut */
+  var prev=el("hip-elements").querySelectorAll("details"),wasOpen={};
+  for(var pi=0;pi<prev.length;pi++)if(prev[pi].open)wasOpen[pi]=true;
+  var gex=el("hip-grade").querySelector("details.gex");
+  var gexOpen=!!(gex&&gex.open);
   /* section 2: the eight elements, one checkbox each */
   var h="";
   for(var ei=0;ei<ELEMENTS.length;ei++){
@@ -771,9 +794,11 @@ function renderFollowup(){
       E.inds.map(function(x){return '<li>'+esc(x)+'</li>';}).join("")+'</ul></details></div>';
   }
   el("hip-elements").innerHTML=h;
-  renderGrade();
+  var now=el("hip-elements").querySelectorAll("details");
+  for(var ni=0;ni<now.length;ni++)if(wasOpen[ni])now[ni].open=true;
+  renderGrade(gexOpen);
 }
-function renderGrade(){
+function renderGrade(keepExampleOpen){
   /* section 3: share of the overall grade — labeled ticks every 20%, unlabeled
      stops every 5%. hpGrade updates the readout and warning surgically so an
      in-progress drag isn't re-rendered out from under the pointer. */
@@ -782,14 +807,16 @@ function renderGrade(){
     '<div class="gscol">'+
     '<input type="range" id="gradeslider" min="0" max="100" step="5" value="'+(gb?S.grade:0)+'"'+
     ' aria-label="Share of the overall course grade, in steps of 5 percent"'+
-    ' onpointerdown="hpGrade(+this.value)" oninput="hpGrade(+this.value)" onkeyup="hpGrade(+this.value)">'+
+    /* no keyup handler — Tab's keyup lands on the slider and would record 0% uninvited;
+       arrow keys fire input, and pointerdown covers a tap on the current position */
+    ' onpointerdown="hpGrade(+this.value)" oninput="hpGrade(+this.value)">'+
     '<div class="gsticks" aria-hidden="true">'+GRADE_STEPS.map(function(v){
       return '<span style="left:calc('+v+'% + '+(8-0.16*v)+'px)">'+v+'%</span>';}).join("")+'</div>'+
     '</div>'+
     '<output class="gsval'+(gb?'':' unset')+'" id="gradeout" for="gradeslider" role="status">'+(gb?esc(gb.label):"—")+'</output></div>'+
     '<span class="dhint" id="gradewarn"></span>'+
     /* worked example of the calculation, per reviewer feedback (Aug 2026) */
-    '<details class="gex"><summary>See an example of how this percentage is calculated</summary><ul>'+
+    '<details class="gex"'+(keepExampleOpen?' open':'')+'><summary>See an example of how this percentage is calculated</summary><ul>'+
     '<li><b>HIPs</b> approaches in the course include place-based learning and ePortfolios.</li>'+
     '<li><b>Elements</b> include high expectations, significant time and effort, structured reflection, and public demonstration.</li>'+
     '<li><b>Assessments</b> include multiple-choice exams (50%), online homework quizzes (20%), <b>a reflection journal (15%)</b>, and <b>a final ePortfolio (15%)</b> &mdash; the two in bold are where the HIPs and elements are incorporated.</li>'+
@@ -813,12 +840,15 @@ function gradeWarn(){
   }
 }
 function hpElem(ei,on){
+  answersChanged();
   S.elems[ei]=on;
   var lab=el("elem-"+ei);
   if(lab)lab.classList.toggle("on",on);
 }
 function hpGrade(v){
   if(!gradeBand(v))return;
+  if(v===S.grade)return; /* pointerdown re-fires with the same value on a plain tap */
+  answersChanged();
   S.grade=v;
   var out=el("gradeout");
   if(out){out.textContent=v+"%";out.classList.remove("unset");}
@@ -830,7 +860,7 @@ function renderResults(){
   var fc=finalCodes(),sel=selectedHips(),nv=naceEval(),miss=hipMissing();
   var h="";
 
-  if(S.submitted)h+='<div class="callout ok">✓ Submitted. '+esc(S.syllabusName||"Your syllabus")+' and your survey are on their way to the portal.'+(fc.codes.length?' Codes below are applied to the course record in Banner.':'')+'</div>';
+  if(S.submitted)h+='<div class="callout ok">✓ Submitted. '+esc(S.syllabusName||"Your syllabus")+' and your survey are on their way to the portal.'+(fc.codes.length?' The codes below will be applied to the course record in Banner.':'')+'</div>';
 
   /* codes card */
   h+='<div class="res"><h3>Banner attribute codes</h3>'+
@@ -863,7 +893,7 @@ function renderResults(){
   if(nv.length){
     h+='<div class="chips">'+nv.map(function(c){return '<span class="chip tag">'+esc(c.name)+'</span>';}).join("")+'</div>';
   }else{
-    h+='<p class="rsub" style="font-style:italic;margin:0">No competencies selected.</p>';
+    h+='<p class="rsub" style="font-style:italic;margin:0">'+(S.naceNone?"No competency tags — you told us none apply to this course.":"No competencies selected.")+'</p>';
   }
   h+='</div>';
 
@@ -886,7 +916,7 @@ function summaryText(){
   var parts=[];
   if(nv.length){
     parts.push(head+" intentionally develops "+listWords(nv.map(function(c){return c.name;}))+
-      " — career-readiness competenc"+(nv.length>1?"ies":"y")+" defined by the National Association of Colleges and Employers (NACE).");
+      " — "+(nv.length>1?"career-readiness competencies":"a career-readiness competency")+" defined by the National Association of Colleges and Employers (NACE).");
   }
   if(sel.length){
     var s=(nv.length?"The course":head)+" incorporates the following High-Impact Practice"+(sel.length>1?"s":"")+": "+
@@ -910,8 +940,10 @@ function copySummary(){
   var t=el("sumtext");if(!t)return;
   t.select();
   var done=function(){snack("Summary copied.");};
-  if(navigator.clipboard){navigator.clipboard.writeText(t.value).then(done,function(){try{document.execCommand("copy");}catch(e){}done();});}
-  else{try{document.execCommand("copy");}catch(e){}done();}
+  var fb=function(){var ok=false;try{ok=document.execCommand("copy");}catch(e){}
+    ok?done():snack("Couldn't copy automatically — the text is selected; press Ctrl/Cmd+C.");};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t.value).then(done,fb);}
+  else fb();
 }
 
 /* ================= completeness (submit gate) ================= */
@@ -938,7 +970,7 @@ function go(n){
     el("view-"+i).classList.toggle("on",i===n);
     var b=el("stbtn-"+i);
     b.classList.toggle("on",i===n);
-    b.classList.toggle("done",i<n&&isDone(i));
+    b.classList.toggle("done",i!==n&&isDone(i)); /* keep checkmarks on later steps when navigating back */
     if(i===n)b.setAttribute("aria-current","step");else b.removeAttribute("aria-current");
   }
   if(n===2)renderNace();
@@ -963,6 +995,11 @@ function isDone(i){
 function sylFile(inp){
   var f=inp.files&&inp.files[0];
   S.syllabusName=f?f.name:"";
+  answersChanged();
+  /* re-derive course details for this file: portal params win, parsed fields refill
+     below — without this, a replaced file keeps the previous file's parse results */
+  var P=getParams(),keys=["course","term","instructor","crn"];
+  for(var ki=0;ki<keys.length;ki++)S[keys[ki]]=P[keys[ki]]||"";
   var t=el("f-sylname");
   t.textContent=f?f.name+"  ("+Math.max(1,Math.round(f.size/1024))+" KB)":"No file attached";
   t.classList.toggle("on",!!f);
@@ -996,8 +1033,9 @@ async function docxText(file){
       var xb=method===8?await inflateBytes(data,"deflate-raw"):data;
       return new TextDecoder("utf-8").decode(xb)
         .replace(/<\/w:p>/g,"\n").replace(/<[^>]+>/g,"")
-        .replace(/&amp;/g,"&").replace(/&lt;/g,"<").replace(/&gt;/g,">")
-        .replace(/&quot;/g,'"').replace(/&apos;/g,"'");
+        /* &amp; last, or "&amp;lt;" would double-decode to "<" */
+        .replace(/&lt;/g,"<").replace(/&gt;/g,">")
+        .replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,"&");
     }
     i=dstart+(csize||1);
   }
@@ -1139,6 +1177,9 @@ async function pdfText(file){
 }
 async function extractSyllabusText(file){
   var name=(file.name||"").toLowerCase();
+  /* the prefill parse decodes the whole file in memory — skip it for very large
+     files (scanned PDFs etc.) rather than freeze the tab; submission is unaffected */
+  if(file.size>20*1024*1024)return "";
   try{
     if(/\.(txt|md)$/.test(name))return await file.text();
     if(/\.html?$/.test(name)){
@@ -1155,7 +1196,9 @@ async function extractSyllabusText(file){
 }
 function parseSyllabusFields(text){
   var found=[];
-  if(!text||text.length<40)return found;
+  /* low bar on purpose: when the body is unreadable the filename line alone
+     ("BIOL-4570-Fall-2026-Syllabus.pdf") is often enough to label the summary */
+  if(!text||text.length<8)return found;
   var t=text.replace(/[ \t]/g," ");
   var lines=t.split(/[\r\n]+/).map(function(l){return l.trim();}).filter(Boolean);
   if(!S.course){
@@ -1204,13 +1247,18 @@ function parseSyllabusFields(text){
   return found;
 }
 async function readSyllabus(file){
+  /* generation guard: if a newer file is attached while this one is still parsing,
+     the stale parse must not write fields or the status note */
+  var gen=readSyllabus._gen=(readSyllabus._gen||0)+1;
   var found=[];
   try{
     /* the filename itself is often the cleanest source ("BIOL-4570-Fall-2026-Syllabus.pdf") */
     var fnameLine=(file.name||"").replace(/\.[^.]+$/,"").replace(/[-_]+/g," ").replace(/\s+/g," ").trim();
     var body=await extractSyllabusText(file);
+    if(gen!==readSyllabus._gen)return;
     found=parseSyllabusFields(fnameLine+"\n"+(body||""));
   }catch(e){}
+  if(gen!==readSyllabus._gen)return;
   var note=el("sylread");if(!note)return;
   if(found.length){
     note.className="hint okc";
@@ -1222,6 +1270,7 @@ async function readSyllabus(file){
   note.style.display="block";
 }
 function setNone(kind,on){
+  answersChanged();
   if(kind==="nace"){
     var had=naceEval().length;
     S.naceNone=on;
@@ -1287,6 +1336,7 @@ function renderSubmit(){
 /* ================= persistence: URL state ================= */
 function serialize(){
   var out={v:3,c:S.course,t:S.term,i:S.instructor,r:S.crn,nn:S.naceNone?1:0,hn:S.hipsNone?1:0,sb:S.submitted?1:0,
+    sa:S.submittedAt||null,
     n:[],h:[],e:[],w:gradeBand(S.grade)?S.grade:null,m:S.mode||null,a:S.abroad||null};
   for(var ci=0;ci<COMPS.length;ci++)if(S.nace[ci])out.n.push(ci);
   HIPS.forEach(function(d){if(S.hips[d.id])out.h.push(d.id);});
@@ -1294,14 +1344,18 @@ function serialize(){
   return btoa(unescape(encodeURIComponent(JSON.stringify(out))));
 }
 function hydrate(){
-  var m=/[?&#]d=([^&]+)/.exec(location.hash||location.search);
+  /* stop at "?" too — portal params may ride after the hash payload (#d=…?course=…),
+     and serialize() output never contains a literal "?" or "&" */
+  var m=/[?&#]d=([^&?]+)/.exec(location.hash||location.search);
   if(!m)return;
   try{
     var o=JSON.parse(decodeURIComponent(escape(atob(decodeURIComponent(m[1])))));
-    if(o.v!==2&&o.v!==3)return; /* saved links from the v1 survey use a different shape — start fresh */
+    if(o.v!==2&&o.v!==3){S._staleLink=true;return;} /* v1 links use a different shape — start fresh */
     S=blankState();
-    S.course=o.c||"";S.term=o.t||"";S.instructor=o.i||"";S.crn=o.r||"";
+    var str=function(v){return typeof v==="string"?v:"";}; /* crafted links may carry non-strings */
+    S.course=str(o.c);S.term=str(o.t);S.instructor=str(o.i);S.crn=str(o.r);
     S.naceNone=!!o.nn;S.hipsNone=!!o.hn;S.submitted=!!o.sb;
+    S.submittedAt=str(o.sa)||null;
     (o.n||[]).forEach(function(ci){if(COMPS[ci])S.nace[ci]=true;});
     (o.h||[]).forEach(function(id){if(hipDef(id))S.hips[id]=true;});
     (o.e||[]).forEach(function(ei){if(ELEMENTS[ei])S.elems[ei]=true;});
@@ -1315,28 +1369,37 @@ function hydrate(){
     S.mode=GLOBAL_MODES.some(function(x){return x.k===o.m;})?o.m:null;
     S.abroad=ABROAD_TYPES.some(function(x){return x.k===o.a;})?o.a:null;
     S._restored=true;
-  }catch(e){}
+  }catch(e){S=blankState();S._badLink=true;} /* truncated/line-wrapped links: say so at boot, don't fail silently */
 }
 function copyLink(){
-  var url=location.href.split("#")[0]+"#d="+encodeURIComponent(serialize());
-  history.replaceState(null,"","#d="+encodeURIComponent(serialize()));
+  /* drop the query string: portal params are already absorbed into the serialized state,
+     and leaving them on the link would override any later edits on restore (params win) */
+  var base=location.href.split("#")[0].split("?")[0];
+  var url=base+"#d="+encodeURIComponent(serialize());
+  try{history.replaceState(null,"",url);}
+  catch(e){history.replaceState(null,"","#d="+encodeURIComponent(serialize()));}
   var done=function(){snack("Link copied — your answers travel with it.");};
-  if(navigator.clipboard){navigator.clipboard.writeText(url).then(done,function(){fallbackCopy(url);done();});}
-  else{fallbackCopy(url);done();}
+  var fail=function(){snack("Couldn't copy automatically — your answers are saved in the address bar; copy the URL from there.");};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(url).then(done,function(){fallbackCopy(url)?done():fail();});}
+  else{fallbackCopy(url)?done():fail();}
 }
 function fallbackCopy(t){var ta=document.createElement("textarea");ta.value=t;ta.style.position="fixed";ta.style.opacity="0";
-  document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand("copy");}catch(e){}document.body.removeChild(ta);}
+  document.body.appendChild(ta);ta.focus();ta.select();var ok=false;try{ok=document.execCommand("copy");}catch(e){}document.body.removeChild(ta);return ok;}
 
 /* ================= exports ================= */
 function recordJSON(){
   var fc=finalCodes(),gb=gradeBand(S.grade),sel=selectedHips();
   return {
     survey:"gsu-course-tagging-v3",
-    submitted:new Date().toISOString(),
+    /* the time of the actual submit — NOT restamped when the JSON is downloaded later */
+    submitted:S.submittedAt||new Date().toISOString(),
     course:{title:S.course,term:S.term,instructor:S.instructor,crn:S.crn},
     syllabusFile:S.syllabusName||null,
     noCompetencies:S.naceNone,noHips:S.hipsNone,
     bannerCodes:fc.codes,
+    /* which of bannerCodes are USG codes still pending GSU integration (ZDGP/ZSAK/ZSAL) —
+       the UI marks these dashed; the flat code list alone doesn't carry that distinction */
+    pendingCodes:fc.codes.filter(function(c){return !!(CODES[c]&&CODES[c].pending);}),
     manualReview:fc.review,
     nace:naceEval().map(function(c){return c.name;}),
     hips:{
@@ -1344,6 +1407,7 @@ function recordJSON(){
       qualifies:hipsQualify(),
       elementsMet:sel.length?elementsMet().map(function(e){return e.t;}):[],
       gradeShare:sel.length&&gb?gb.label:null,
+      gradeSharePercent:sel.length&&gb?gb.k:null, /* the number for logic; gradeShare is its display label */
       globalModality:S.hips.global?(S.mode||null):null,
       studyAbroadType:S.hips.global&&S.mode==="abroad"?(S.abroad||null):null,
       missing:sel.length?hipMissing():[]
@@ -1371,6 +1435,9 @@ function printSummary(){
   h+='</table>';
   h+='<h2>Banner attribute codes</h2>';
   h+=fc.codes.length?'<div class="chips">'+fc.codes.map(chipCode).join("")+'</div>':'<p style="font-size:14px">None from this survey.</p>';
+  /* the on-screen dashed-chip legend doesn't travel with the print — restate it */
+  if(fc.codes.some(function(c){return !!(CODES[c]&&CODES[c].pending);}))
+    h+='<p style="font-size:12px;color:#5a6273">Dashed codes are new USG codes still being integrated at GSU — recorded now, applied when integration is complete.</p>';
   if(fc.review)h+='<p style="font-size:13px">+ Place-Based Learning — flagged for manual review (no Banner code yet).</p>';
   if(sel.length){
     h+='<h2>High-Impact Practices'+(hipsQualify()?"":" (selected — not yet at HIP level)")+'</h2><ul class="iconlist">'+
@@ -1382,7 +1449,7 @@ function printSummary(){
   if(nv.length)h+='<h2>Career-ready skills (NACE)</h2><ul class="iconlist">'+
     nv.map(function(c){return '<li>'+(NACE_ICONS[c.icon]?'<img src="'+NACE_ICONS[c.icon]+'" alt="">':'')+'<span>'+esc(c.name)+'</span></li>';}).join("")+'</ul>';
   h+='<h2>Summary</h2><p style="font-size:13.5px;max-width:640px;white-space:pre-wrap">'+esc(summaryText())+'</p>';
-  h+='<p style="font-size:12px;color:#5a6273;margin-top:22px"><img src="'+FLAME_URI+'" alt="" style="height:26px;vertical-align:middle;margin-right:8px">Georgia State University · Course Tagging Survey</p></div>';
+  h+='<p style="font-size:12px;color:#5a6273;margin-top:22px">'+(FLAME_URI?'<img src="'+FLAME_URI+'" alt="" style="height:26px;vertical-align:middle;margin-right:8px">':'')+'Georgia State University · Course Tagging Survey</p></div>';
   el("printArea").innerHTML=h+'<style>@page{size:letter portrait;margin:16mm}</style>';
   window.print();
 }
@@ -1390,7 +1457,10 @@ function submitSurvey(){
   var b=completeness();
   if(b.length){renderSubmit();snack("A few things to finish first — see the checklist.");return;}
   /* Wire this to the syllabus-portal backend: POST the syllabus file (el("f-syl").files[0])
-     together with recordJSON(). The survey gates the upload — no record, no upload. */
+     together with recordJSON() — multipart/form-data, parts "syllabus" + "record".
+     The survey gates the upload — no record, no upload. Gate the success snack and
+     go(5) below on a real 2xx, add a failure state, and drop the console.log. */
+  S.submittedAt=new Date().toISOString();
   console.log("course-tagging-record",recordJSON());
   S.submitted=true;
   go(5);
@@ -1434,6 +1504,8 @@ hydrate();
 hydrateParams();
 go(0);
 if(S._restored)snack("Saved answers restored from your link — re-attach your syllabus at step 1 if you plan to revise and resubmit.");
+else if(S._badLink)snack("Couldn't read the saved answers in this link (it may have been cut off in an email) — starting fresh.");
+else if(S._staleLink)snack("This link is from an older version of the survey — starting fresh.");
 </script>
 </body>
 </html>
